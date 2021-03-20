@@ -2,10 +2,15 @@
   "name": "slack-first",
   "version": "1.0.0",
   "description": "Slack First is a chat-bot for Operate First",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
+    "start": "tsc && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "tslint": "^6.1.3",
+    "typescript": "^4.2.3"
+  }
 }
