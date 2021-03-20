@@ -53,22 +53,28 @@ const messageText = (support, user) => `Hey <@${support}>, can you please help <
 
 const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackShortcutMiddlewareArgs> = async ({ body, payload, ack, client, respond, say, context }) => {
     await ack();
-    if (!body.message) {
+
+    if (!body.message && !payload.value) {
         // Global shortcut was used and there's no message to respond to
         const message = await client.chat.postMessage({
             channel: supportChannelId,
             text: `<@${context.onCallUser}>, you've been summoned to help, watch this thread please.`
         })
-        if (message.ok) {
-            console.log(body)
-            await client.chat.postMessage({ channel: message.channel, thread_ts: message.ts, text: `<@${body.user.id}>, please describe your problem in this thread.`})
-        }
-    } else if (body.message.thread_ts) {
+        if (!message.ok) { return; }
+
+        await client.chat.postMessage({
+            channel: message.channel,
+            thread_ts: message.ts,
+            text: `<@${body.user.id}>, please describe your problem in this thread.`
+        })
+
+    } else if (body.message?.thread_ts) {
         // Shortcut was used in a thread, reply to the thread
         await say({
             text: messageText(context.onCallUser, body.user.id),
             thread_ts: body.message.thread_ts
         })
+
     } else {
         // Triggered as: Shortcut used on a message in a channel or Action in a dialog (button from onCallEphemeralMessage)
         await client.chat.postMessage({
@@ -76,10 +82,11 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
             thread_ts: payload.value || body.message.ts,
             text: messageText(context.onCallUser, body.user_id || body.user.id)
         })
-        if (payload.value) {
-            // Activated by clicking a button in ephemeral message
-            await respond({ delete_original: true });
-        }
+
+        // Not activated by clicking a button in ephemeral message
+        if (!payload.value) { return; }
+
+        await respond({ delete_original: true });
     }
 
 };
