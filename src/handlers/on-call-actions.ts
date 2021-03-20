@@ -1,8 +1,11 @@
 // @ts-nocheck
-import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs } from '@slack/bolt';
+import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs } from '@slack/bolt';
+import { onCallContext } from '../middleware/config';
+
+const supportChannelId = 'C01RY7X79R9';
 
 const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client }) => {
-    if (message.channel != 'C01RY7X79R9') {
+    if (message.channel != supportChannelId) {
         return;
     };
 
@@ -45,14 +48,52 @@ const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = 
     });
 };
 
-const tagOnCallPerson: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ body, payload, ack, client, respond }) => {
+const messageText = (support, user) => `Hey <@${support}>, can you please help <@${user}>?`;
+
+
+const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackShortcutMiddlewareArgs> = async ({ body, payload, ack, client, respond, say, context }) => {
     await ack();
-    await client.chat.postMessage({ channel: body.channel.id, thread_ts: payload.value, text: `Hey, notice me! <@${body.user.id}>` })
-    await respond({ delete_original: true });
+    if (!body.message) {
+        // Global shortcut was used and there's no message to respond to
+        const message = await client.chat.postMessage({
+            channel: supportChannelId,
+            text: `<@${context.onCallUser}>, you've been summoned to help, watch this thread please.`
+        })
+        if (message.ok) {
+            console.log(body)
+            await client.chat.postMessage({ channel: message.channel, thread_ts: message.ts, text: `<@${body.user.id}>, please describe your problem in this thread.`})
+        }
+    } else if (body.message.thread_ts) {
+        // Shortcut was used in a thread, reply to the thread
+        await say({
+            text: messageText(context.onCallUser, body.user.id),
+            thread_ts: body.message.thread_ts
+        })
+    } else {
+        // Triggered as: Shortcut used on a message in a channel or Action in a dialog (button from onCallEphemeralMessage)
+        await client.chat.postMessage({
+            channel: body.channel.id,
+            thread_ts: payload.value || body.message.ts,
+            text: messageText(context.onCallUser, body.user_id || body.user.id)
+        })
+        if (payload.value) {
+            // Activated by clicking a button in ephemeral message
+            await respond({ delete_original: true });
+        }
+    }
+
 };
+
+const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, respond, context }) => {
+    await ack();
+    // Respond to the command via ephemeral message
+    await respond(`<@${context.onCallUser}> is the support person of the day! Please ask him in a DM or post a message in <#${supportChannelId}> channel`);
+}
 
 export const init = (app: App) => {
     app.message('?', onCallEphemeralMessage);
-    app.action('tag_on_call_person', tagOnCallPerson);
+    app.action('tag_on_call_person', onCallContext, tagOnCallAction);
+    app.shortcut('tag_on_call_person', onCallContext, tagOnCallAction);
+    app.command('/oncall', onCallContext, tagOnCallCommand);
 };
 export default init;
