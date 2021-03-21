@@ -117,3 +117,7 @@ dist
 
 # Dev setup
 dev.config.yaml
+
+# Local build
+build
+upload

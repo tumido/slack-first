@@ -2,11 +2,19 @@
 
 # 1st Operator
 
-![](https://david-dm.org/tumido/slack-first.svg)
+![depedencies](https://david-dm.org/tumido/slack-first.svg)
 
-## Requirements
+## Build requirements
 
-- NodeJS v14
+Local builds:
+
+- [NPM](http://npmjs.com/)
+- [NodeJS v14](https://nodejs.org/en/)
+- [s2i](https://github.com/openshift/source-to-image) and [Podman](https://podman.io/)
+
+Remote build:
+
+- [AiCoE-CI](https://github.com/AICoE/aicoe-ci) integration
 
 ## Configuration
 
@@ -21,9 +29,9 @@ onCall: person-on-call-duty@example.com # Email address associated with a Slack 
 
 ## Development setup
 
-Development mode runs the bot in a hot reloading mode - automatically recompiling on code changes. The config file is also reloaded on any changes.
-
 ### Run bot locally
+
+Locally in development mode runs the bot in a hot reloading mode - automatically recompiling on code changes. The config file is also reloaded on any changes.
 
 1. Install prerequisites: [NPM](http://npmjs.com/) and [Ngrok](https://ngrok.com/)
 2. Install all dependencies:
@@ -55,9 +63,11 @@ Development mode runs the bot in a hot reloading mode - automatically recompilin
 4. Prepare local environment:
 
    ```sh
-   export SLACK_BOT_TOKEN=xoxb-****  # Obtained from Slack config, see Setup Slack application
-   export SLACK_SIGNING_SECRET=****  # Obtained from Slack config, see Setup Slack application
-   export SLACK_BOT_CONFIG=./dev.config.yaml
+   cat <<EOF > .env
+   SLACK_BOT_TOKEN=xoxb-****  # Obtained from Slack config, see Setup Slack application
+   SLACK_SIGNING_SECRET=****  # Obtained from Slack config, see Setup Slack application
+   SLACK_BOT_CONFIG=./dev.config.yaml
+   EOF
    ```
 
 5. Create local configuration file at `./dev.config.yaml`
@@ -80,6 +90,17 @@ Development mode runs the bot in a hot reloading mode - automatically recompilin
    [1] [nodemon] starting `node dist/app.js`
    [1] ⚡️ Bolt app is running!
    ```
+
+### Run in container
+
+If you desire to run the bot locally in container, follow the [Run bot locally](#run-bot-locally) guide up until the last step. Instead of the last step run:
+
+```sh
+npm run s2i:build
+podman run --env-file=.env -e SLACK_BOT_CONFIG=/mnt/config.yaml --mount type=bind,source=dev.config.yaml,dst=/mnt/config.yaml -p 3000:3000 slack-first:latest
+```
+
+This launch method uses `npm start` command which runs the production build of the bot - Hot reloading is disabled.
 
 ### Setup Slack application
 
@@ -144,14 +165,23 @@ Development mode runs the bot in a hot reloading mode - automatically recompilin
 
 ## Deployment
 
-### Build application container
+### Create application container
 
-```sh
-npm run s2i:build
-```
+1. Build the image
+
+   ```sh
+   npm run s2i:build
+   ```
+
+2. Tag the container image and push to repo
+
+   ```sh
+   podman tag slack-first quay.io/operate-first/slack-bot
+   podman push quay.io/operate-first/slack-bot
+   ```
 
 ### Deploy in Kubernetes
 
 ```sh
-$ kustomize build manifests | kubectl apply -f -
+kustomize build manifests | kubectl apply -f -
 ```

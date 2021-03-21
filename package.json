@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/app.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "s2i:build": "mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-14 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest"
   },
   "author": "",
   "license": "GPL-3.0-or-later",
