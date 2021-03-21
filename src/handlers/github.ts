@@ -89,11 +89,13 @@ const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, cont
     const { github }: { github: Octokit } = context;
     const [issueBody, repos] = await Promise.all([fetchThreadBody(body, client), fetchRepos(github)]);
 
+    const ts = body.message.thread_ts || body.message_ts;
     await client.views.open({
         trigger_id: body.trigger_id,
         view: {
             type: 'modal',
             callback_id: 'open_issue',
+            private_metadata: `${ts}|${body.channel.id}`,
             title: {
                 type: 'plain_text',
                 text: 'Open issue'
@@ -163,13 +165,20 @@ const openIssue: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, view, 
     const { github }: { github: Octokit } = context;
 
     const [owner, repo] = view.state.values.repo.repo_select.selected_option.value.split('/')
-    await github.issues.create({
+    const [thread_ts, channel] = body.view.private_metadata.split("|")
+    const issue = await github.issues.create({
         owner,
         repo,
         title: view.state.values.title.title.value,
         body: view.state.values.body.body.value,
         labels: context.config.issueLabels
     });
+
+    await client.chat.postMessage({
+        channel,
+        thread_ts,
+        text: `This post/thread was captured in an issue: ${issue.data.html_url}`
+    })
 }
 
 

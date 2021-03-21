@@ -75,6 +75,23 @@ const introduction = (supportChannelId) => ({
             alt_text: "global_shortcut"
         },
         {
+            type: "section",
+            text: {
+                type: "mrkdwn",
+                text: "*5️⃣ Use the _Create issue_ shortcut.* If you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_)."
+            }
+        },
+        {
+            type: "image",
+            title: {
+                type: "plain_text",
+                text: "global_shortcut",
+                emoji: true
+            },
+            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif",
+            alt_text: "global_shortcut"
+        },
+        {
             type: "divider"
         },
         {
