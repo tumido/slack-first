@@ -25,6 +25,7 @@ Supported settings:
 ```yaml
 supportChannelId: ID_OF_SUPPORT_CHANNEL # e.g. C01RY7X79R9
 onCall: person-on-call-duty@example.com # Email address associated with a Slack account
+issueLabels: [question]
 ```
 
 ## Development setup
@@ -64,9 +65,12 @@ Locally in development mode runs the bot in a hot reloading mode - automatically
 
    ```sh
    cat <<EOF > .env
-   SLACK_BOT_TOKEN=xoxb-****  # Obtained from Slack config, see Setup Slack application
-   SLACK_SIGNING_SECRET=****  # Obtained from Slack config, see Setup Slack application
+   SLACK_BOT_TOKEN=xoxb-****           # Obtained from Slack config, see Setup Slack application
+   SLACK_SIGNING_SECRET=****           # ^
    SLACK_BOT_CONFIG=./dev.config.yaml
+   GITHUB_APP_ID=number                # Obtained from Github App config, see Setup Github App
+   GITHUB_INSTALLATION_ID=number       # ^
+   GITHUB_PRIVATE_KEY=github.pem       # ^
    EOF
    ```
 
@@ -124,10 +128,11 @@ This launch method uses `npm start` command which runs the production build of t
    2. Set _Request URL_ to the Bot URL obtained from Ngrok.
    3. Add following shortcuts via _Create New Shortcut_ button:
 
-      | Name         | Scope   | Description                                 | Callback ID          |
-      | ------------ | ------- | ------------------------------------------- | -------------------- |
-      | Ask for help | Global  | Get help from a support person on-call duty | `tag_on_call_person` |
-      | Ask for help | Message | Get help from a support person on-call duty | `tag_on_call_person` |
+      | Name         | Scope   | Description                                 | Callback ID             |
+      | ------------ | ------- | ------------------------------------------- | ----------------------- |
+      | Ask for help | Global  | Get help from a support person on-call duty | `tag_on_call_person`    |
+      | Ask for help | Message | Get help from a support person on-call duty | `tag_on_call_person`    |
+      | Create issue | Message | Creates an issue from a thread or a message | `open_issue_for_thread` |
 
    4. _Save Changes_
 
@@ -162,6 +167,23 @@ This launch method uses `npm start` command which runs the production build of t
 1. _Event Subscriptions_ tab - _Request URL_. (The bot must be already running, otherwise Slack won't let you change this value.)
 2. _Interactivity & Shortcuts_ tab - _Request URL_.
 3. _Slash Commands_ tab - edit each command.
+
+### Setup GitHub Application
+
+1. [Create new GitHub App](https://github.com/settings/apps/new)
+2. Fill in a name, homepage URL (can be any valid URL starting with `http://` or `https://`)
+3. Deselect _Active_ checkbox in _Webhook_ section
+4. In _Repository permissions_ section enable _Read & Write_ for _Issues_ scope.
+5. Hit _Create GitHub App_
+6. Install your application:
+   1. Go to _Install App_ tab
+   2. Click _Install_ and confirm granted permissions
+   3. In _Repository access_ select all repositories that you want this bot to have access to.
+7. Obtain credentials:
+   1. Go to your [GitHub Apps](https://github.com/settings/apps) page and click _Edit_
+   2. `GITHUB_APP_ID` is _App ID_ in the _About_ section on the _General_ tab
+   3. `GITHUB_INSTALLATION_ID`: on _Install App_ tab click the gear button. Check the URL for your installation ID: `https://github.com/settings/installations/THIS_IS_THE_ID`
+   4. `GITHUB_PRIVATE_KEY`: On the _General_ tab scroll to _Private Keys_ section and click _Generate a private key_. Save the key to your machine and set path to this file into the `GITHUB_PRIVATE_KEY` variable
 
 ## Deployment
 

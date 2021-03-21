@@ -51,7 +51,7 @@ const messageText = (support, user) => `Hey <@${support}>, can you please help <
 const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackShortcutMiddlewareArgs> = async ({ body, payload, ack, client, respond, say, context }) => {
     await ack();
 
-    if (!body.message && !payload.value) {
+    if (body.type === 'shortcut') {
         // Global shortcut was used and there's no message to respond to
         const message = await client.chat.postMessage({
             channel: context.config.supportChannelId,
