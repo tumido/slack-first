@@ -24,6 +24,16 @@ const introduction = (supportChannelId) => ({
             }
         },
         {
+            type: "image",
+            title: {
+                type: "plain_text",
+                text: "oncall_command",
+                emoji: true
+            },
+            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/oncall_command.png",
+            alt_text: "oncall_command"
+        },
+        {
             type: "section",
             text: {
                 type: "mrkdwn",
@@ -51,7 +61,7 @@ const introduction = (supportChannelId) => ({
             type: "section",
             text: {
                 type: "mrkdwn",
-                text: "*4️⃣ Use the _Ask for help_ shortcut.* If you want to want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu."
+                text: "*4️⃣ Use the _Ask for help_ shortcut.* If you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu."
             }
         },
         {
