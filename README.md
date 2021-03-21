@@ -28,6 +28,41 @@ onCall: person-on-call-duty@example.com # Email address associated with a Slack 
 issueLabels: [question]
 ```
 
+## Features
+
+### Use the /oncall command
+
+Type `/oncall` and the bot will tell you who is the dedicated support person on call duty for today.
+
+![oncall_command](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/oncall_command.png)
+
+### Ask a question at #support
+
+If the bot notices a message with a question mark in the `#support` channel's main thread, it will offer the sender to tag the person on call duty for the day. The conversation with this person is opened as a thread to the original message.
+
+![support_question](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png)
+
+### Use the Ask for help action
+
+If you want to raise a particular message to attention of the support team, select `Ask for help` in a message's context menu (click on _More actions_).
+
+![message_shortcut](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif)
+
+### Use the Ask for help shortcut
+
+If you want to start a chat with the support team immediately, select `Ask for help` from the Shortcuts menu. A message thread will be started in the `#support` channel for you.
+![global_shortcut](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif)
+
+### Use the Create issue shortcut
+
+If you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).
+
+![github_issue](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif)
+
+### Get this feature list
+
+Type `help` in a DM to the bot to receive a full feature list any time.
+
 ## Development setup
 
 ### Run bot locally

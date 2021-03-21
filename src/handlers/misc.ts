@@ -41,6 +41,15 @@ const introduction = (supportChannelId) => ({
             }
         },
         {
+            type: "image",
+            title: {
+                type: "plain_text",
+                text: "support_channel_question"
+            },
+            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png",
+            alt_text: "support_channel_question"
+        },
+        {
             type: "section",
             text: {
                 type: "mrkdwn",
@@ -51,8 +60,7 @@ const introduction = (supportChannelId) => ({
             type: "image",
             title: {
                 type: "plain_text",
-                text: "message_shortcut",
-                emoji: true
+                text: "message_shortcut"
             },
             image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif",
             alt_text: "message_shortcut"
@@ -68,8 +76,7 @@ const introduction = (supportChannelId) => ({
             type: "image",
             title: {
                 type: "plain_text",
-                text: "global_shortcut",
-                emoji: true
+                text: "global_shortcut"
             },
             image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif",
             alt_text: "global_shortcut"
@@ -85,11 +92,10 @@ const introduction = (supportChannelId) => ({
             type: "image",
             title: {
                 type: "plain_text",
-                text: "global_shortcut",
-                emoji: true
+                text: "github_issue"
             },
             image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif",
-            alt_text: "global_shortcut"
+            alt_text: "github_issue"
         },
         {
             type: "divider"
