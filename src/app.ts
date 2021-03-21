@@ -1,11 +1,6 @@
 import { App } from '@slack/bolt';
 import initHandlers from './handlers';
-
-// Initializes your app with your bot token and signing secret
-const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET
-});
+import { configMiddleware, initConfigMiddleware } from './middleware/config';
 
 const healthCheck = () => {
     try {
@@ -17,10 +12,17 @@ const healthCheck = () => {
         process.exit(1);
     }
 }
+healthCheck();
 
+// Initializes your app with your bot token and signing secret
+const app = new App({
+    token: process.env.SLACK_BOT_TOKEN,
+    signingSecret: process.env.SLACK_SIGNING_SECRET
+});
 
 (async () => {
-    healthCheck()
+    initConfigMiddleware();
+    app.use(configMiddleware);
     initHandlers(app);
     // Start your app
     await app.start(process.env.PORT ? parseInt(process.env.PORT) : 3000);

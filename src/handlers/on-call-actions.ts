@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs } from '@slack/bolt';
-import { configContext } from '../middleware/config';
 
 const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client, context }) => {
     if (message.channel != context.config.supportChannelId) {
@@ -95,9 +94,9 @@ const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, r
 }
 
 export const init = (app: App) => {
-    app.message('?', configContext, onCallEphemeralMessage);
-    app.action('tag_on_call_person', configContext, tagOnCallAction);
-    app.shortcut('tag_on_call_person', configContext, tagOnCallAction);
-    app.command('/oncall', configContext, tagOnCallCommand);
+    app.message('?', onCallEphemeralMessage);
+    app.action('tag_on_call_person', tagOnCallAction);
+    app.shortcut('tag_on_call_person', tagOnCallAction);
+    app.command('/oncall', tagOnCallCommand);
 };
 export default init;

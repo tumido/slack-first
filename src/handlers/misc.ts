@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { App, Middleware, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt';
-import { configContext } from '../middleware/config';
 
 const dismissMessage: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ ack, respond }) => {
     await ack();
@@ -98,7 +97,7 @@ const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, cl
 
 const init = (app: App) => {
     app.action('dismiss_message', dismissMessage);
-    app.event('member_joined_channel', configContext, introduceOnJoin);
-    app.message('help', configContext, helpMessage);
+    app.event('member_joined_channel', introduceOnJoin);
+    app.message('help', helpMessage);
 };
 export default init;
