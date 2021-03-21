@@ -1,6 +1,5 @@
 import { App } from '@slack/bolt';
 import initHandlers from './handlers';
-import { getConfig } from './middleware/config';
 
 // Initializes your app with your bot token and signing secret
 const app = new App({

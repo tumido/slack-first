@@ -1,11 +1,9 @@
 // @ts-nocheck
 import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs } from '@slack/bolt';
-import { onCallContext } from '../middleware/config';
+import { configContext } from '../middleware/config';
 
-const supportChannelId = 'C01RY7X79R9';
-
-const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client }) => {
-    if (message.channel != supportChannelId) {
+const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client, context }) => {
+    if (message.channel != context.config.supportChannelId) {
         return;
     };
 
@@ -57,7 +55,7 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
     if (!body.message && !payload.value) {
         // Global shortcut was used and there's no message to respond to
         const message = await client.chat.postMessage({
-            channel: supportChannelId,
+            channel: context.config.supportChannelId,
             text: `<@${context.onCallUser}>, you've been summoned to help, watch this thread please.`
         })
         if (!message.ok) { return; }
@@ -93,13 +91,13 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
 const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, respond, context }) => {
     await ack();
     // Respond to the command via ephemeral message
-    await respond(`<@${context.onCallUser}> is the support person of the day! Please ask him in a DM or post a message in <#${supportChannelId}> channel`);
+    await respond(`<@${context.onCallUser}> is the support person of the day! Please ask him in a DM or post a message in <#${context.config.supportChannelId}> channel`);
 }
 
 export const init = (app: App) => {
-    app.message('?', onCallEphemeralMessage);
-    app.action('tag_on_call_person', onCallContext, tagOnCallAction);
-    app.shortcut('tag_on_call_person', onCallContext, tagOnCallAction);
-    app.command('/oncall', onCallContext, tagOnCallCommand);
+    app.message('?', configContext, onCallEphemeralMessage);
+    app.action('tag_on_call_person', configContext, tagOnCallAction);
+    app.shortcut('tag_on_call_person', configContext, tagOnCallAction);
+    app.command('/oncall', configContext, tagOnCallCommand);
 };
 export default init;
