@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "@slack/bolt": "^3.3.0",
-    "js-yaml": "^3.14.1"
+    "js-yaml": "^4.0.0"
   }
 }

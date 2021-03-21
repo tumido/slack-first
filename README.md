@@ -2,6 +2,12 @@
 
 # 1st Operator
 
+![](https://david-dm.org/tumido/slack-first.svg)
+
+## Requirements
+
+- NodeJS v14
+
 ## Configuration
 
 The bot can be configured via a local YAML config file. It watches for changes on this file and reflects the new config internally while running.
