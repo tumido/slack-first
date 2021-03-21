@@ -15,7 +15,7 @@ const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = 
                 type: "section",
                 text: {
                     type: "mrkdwn",
-                    text: `Hi <@${message.user}>!\n\nI see you've posted a question in this channel.\n\nDo you want me to tag the person who's on call duty for today?`,
+                    text: `Hi <@${message.user}>!\n\nI see you've posted a question in this channel.\n\nDo you want me to tag <@${context.onCallUser}> who's on call duty for today?`,
                 },
             },
             {
@@ -25,7 +25,7 @@ const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = 
                         type: "button",
                         text: {
                             type: "plain_text",
-                            text: "Please tag the right person for me"
+                            text: `Yes, please`
                         },
                         action_id: "tag_on_call_person",
                         style: "primary",
