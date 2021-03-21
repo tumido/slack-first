@@ -88,7 +88,6 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
 
         await respond({ delete_original: true });
     }
-
 };
 
 const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, respond, context }) => {
