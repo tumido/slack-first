@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/tumido/slack-first/compare/v1.0.0...v1.0.1) (2021-03-22)
+
+
+### Bug Fixes
+
+* A type anotation was dropping a promise ([f5c1997](https://github.com/tumido/slack-first/commit/f5c1997d1a148b03114bc751fdab23444572749e))
+
 # 1.0.0 (2021-03-22)
 
 
