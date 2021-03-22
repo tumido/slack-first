@@ -1,8 +1,23 @@
 {
   "name": "slack-first",
+  "displayName": "Slack First",
   "version": "1.0.0",
   "description": "Slack First is a chat-bot for Operate First",
+  "homepage": "https://github.com/tumido/slack-first",
   "main": "dist/app.js",
+  "author": {
+    "name": "Tom Coufal",
+    "url": "https://github.com/tumido"
+  },
+  "bugs": {
+    "url": "https://github.com/tumido/slack-firstissues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tumido/slack-first.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "private": true,
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
@@ -11,8 +26,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "s2i:build": "mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-14 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest"
   },
-  "author": "",
-  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/js-yaml": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
@@ -63,5 +76,38 @@
       "no-throw-literal": "warn",
       "semi": "off"
     }
+  },
+  "release": {
+    "branches": "master",
+    "verifyConditions": [
+      "@semantic-release/github"
+    ],
+    "publish": [
+      "@semantic-release/github"
+    ],
+    "success": [
+      "@semantic-release/github"
+    ],
+    "fail": [
+      "@semantic-release/github"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules": [
+            {
+              "type": "docs",
+              "release": "patch"
+            }
+          ]
+        }
+      ],
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
+    ]
   }
 }
