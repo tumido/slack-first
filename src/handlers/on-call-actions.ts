@@ -1,6 +1,10 @@
 // @ts-nocheck
 import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackShortcutMiddlewareArgs } from '@slack/bolt';
 
+/**
+ * Respond to messages containing `?` in `supportChannelId` channel
+ * @param param0 Slack payload for message responses
+ */
 const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client, context }) => {
     if (message.channel != context.config.supportChannelId) {
         return;
@@ -47,7 +51,15 @@ const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = 
 
 const messageText = (support, user) => `Hey <@${support}>, can you please help <@${user}>?`;
 
-
+/**
+ * Ask for help action handler
+ *
+ * Can be triggered as a shortcut or via clicking on a button in a message.
+ *
+ * If this handler is triggered as a result of a global shortcut by clicking on a button, we want to create new message in support channel and thread and tag in there.
+ * If it is triggered on a message, respond on the message directly into a thread.
+ * @param param0 Slack payload on message response or on shortcut action
+ */
 const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackShortcutMiddlewareArgs> = async ({ body, payload, ack, client, respond, say, context }) => {
     await ack();
 
@@ -87,12 +99,20 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
     }
 };
 
+/**
+ * Respond to a command via a private "Only visible to you" message
+ * @param param0 Slack payload to a command event
+ */
 const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, respond, context }) => {
     await ack();
     // Respond to the command via ephemeral message
     await respond(`<@${context.onCallUser}> is the support person of the day! Please ask him in a DM or post a message in <#${context.config.supportChannelId}> channel`);
 }
 
+/**
+ * Subscribe to events for on-call actions
+ * @param app Slack App
+ */
 export const init = (app: App) => {
     app.message('?', onCallEphemeralMessage);
     app.action('tag_on_call_person', tagOnCallAction);

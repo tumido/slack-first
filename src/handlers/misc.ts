@@ -1,11 +1,20 @@
 // @ts-nocheck
 import { App, Middleware, SlackActionMiddlewareArgs, SlackCommandMiddlewareArgs, SlackEventMiddlewareArgs } from '@slack/bolt';
 
+/**
+ * Simple delete of given message
+ * @param param0 Slack payload for an action
+ */
 const dismissMessage: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ ack, respond }) => {
     await ack();
     await respond({ delete_original: true });
 };
 
+/**
+ * Message posted as an introduction or help
+ * @param supportChannelId ID of a support channel from the configuration file
+ * @returns Message content
+ */
 const introduction = (supportChannelId) => ({
     text: "Hey there 👋 I'm your 1st Operator.",
     blocks: [
@@ -112,12 +121,19 @@ const introduction = (supportChannelId) => ({
     ]
 });
 
+/**
+ * React to `help` messages in direct messages only
+ * @param param0 Slack payload for command action
+ */
 const helpMessage: Middleware<SlackCommandMiddlewareArgs> = async ({ say, message, context }) => {
     if (message.channel_type !== 'im') { return; }
     await say(introduction(context.config.supportChannelId))
 }
 
-
+/**
+ * Introduce when joining a channel
+ * @param param0 Slack payload for event reactiop
+ */
 const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, client, context }) => {
     const auth = await client.auth.test()
     if (!auth.ok || auth.user_id != event.user) { return; }
@@ -128,6 +144,10 @@ const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, cl
     })
 }
 
+/**
+ * Subscribe to events for misc
+ * @param app Slack App
+ */
 const init = (app: App) => {
     app.action('dismiss_message', dismissMessage);
     app.event('member_joined_channel', introduceOnJoin);

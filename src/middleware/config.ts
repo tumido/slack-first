@@ -5,13 +5,30 @@ import { Middleware, AnyMiddlewareArgs } from '@slack/bolt';
 
 const configFileName = process.env.SLACK_BOT_CONFIG as string;
 
-const loadConfig = (): Object => {
+type Config = {
+    supportChannelId: string
+    onCall: string
+    issueLabels: Array<string>
+}
+
+/**
+ * Load and parse YAML content of the config file
+ * @returns Content of the config file
+ */
+const loadConfig = (): Config => {
     return yaml.load(fs.readFileSync(configFileName).toString()) || {};
 }
 
 var currentWatcher;
 var config;
-export const initConfigMiddleware = () => {
+
+/**
+ * Config middleware initializer
+ * 
+ * Starts the file watch for config changes or file changes using fs.watch. This uses Inotify, therefore it has to be requeued if the file is moved
+ * @param debounceTime fs.watch can trigger multiple events for a single change. Debounce reduces the noise.
+ */
+export const initConfigMiddleware = (debounceTimeout = 100) => {
     let debounce = false;
     const watchConfigFile = () => {
         return fs.watch(configFileName, (event, filename) => {
@@ -20,6 +37,7 @@ export const initConfigMiddleware = () => {
                 return;
             }
             if (event === 'rename') {
+                // File was moved or replaced. Watch has to be restarted to watch on the intended path
                 console.log(`${filename}: watch has expired. Requeueing.`)
                 currentWatcher.close();
                 currentWatcher = watchConfigFile();
@@ -37,14 +55,19 @@ export const initConfigMiddleware = () => {
     config = loadConfig();
 }
 
-
+/**
+ * Middleware used to fetch the config file content and make it available to message handlers.
+ * @param param0 Arguments passed to Slack middleware
+ */
 export const configMiddleware: Middleware<AnyMiddlewareArgs> = async ({ context, next, client }) => {
     context.config = config;
 
+    // Translate onCall email into a user ID
     const user = await client.users.lookupByEmail({ 'email': context.config.onCall })
     if (user.ok) {
         context.onCallUser = user.user.id;
     }
+
     if (next) await next();
 }
 

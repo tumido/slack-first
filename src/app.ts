@@ -7,6 +7,7 @@ import initHandlers from './handlers';
 import { configMiddleware, initConfigMiddleware } from './middleware/config';
 import { initGithubMiddleware } from './middleware/github';
 
+
 const healthCheck = () => {
     try {
         if (!process.env.SLACK_BOT_TOKEN) throw 'SLACK_BOT_TOKEN: Token not set';
@@ -40,9 +41,12 @@ const githubApp = new Octokit({
 });
 
 (async () => {
+    // Setup middlewares first
     initConfigMiddleware();
     initGithubMiddleware(githubApp);
+    // Use configMiddleware for every handler
     app.use(configMiddleware);
+    // Add handlers to the app
     initHandlers(app);
     // Start your app
     await app.start(process.env.PORT ? parseInt(process.env.PORT) : 3000);
