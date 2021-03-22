@@ -246,6 +246,10 @@ This launch method uses `npm start` command which runs the production build of t
 
 ### Deploy in Kubernetes
 
+Use the `manifests/base` folder as your remote kustomize base.
+
+For development purposes the `dev` overlay contains all necessary secrets to access `myfancytestworkspace.slack.com` Slack workspace. Apply via:
+
 ```sh
-kustomize build manifests | kubectl apply -f -
+kustomize build --enable_alpha_plugins manifests/overlays/dev | kubectl apply -f -
 ```

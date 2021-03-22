@@ -1,0 +1,10 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: slack-first
+data:
+  config.yaml: |
+    supportChannelId: C01RY7X79R9
+    onCall: qgzscsdqiaipryerya@twzhhq.com
+    issueLabels: [question]
