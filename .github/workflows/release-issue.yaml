@@ -114,24 +114,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Close Issue
-        uses: peter-evans/close-issue@v1
-        if: steps.semantic.outputs.new_release_published != 'true'
-        with:
-          issue-number: ${{ github.event.issue.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  notify-end:
-    name: Notify when finished
-    needs: [release]
-    runs-on: ubuntu-latest
-    steps:
       - name: Update comment
         uses: peter-evans/create-or-update-comment@v1
+        if: steps.semantic.outputs.new_release_published == 'true'
         with:
-          issue-number: ${{ github.event.client_payload.github.event.issue.number }}
-          comment-id: ${{ github.event.client_payload.commentId }}
+          issue-number: ${{ github.event.issue.number }}
+          comment-id: ${{ needs.check-release.outputs.commentId }}
           body: |
             🎉 Released!
         env:
