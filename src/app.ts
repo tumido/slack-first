@@ -1,7 +1,8 @@
 import fs from 'fs';
-import { App } from '@slack/bolt';
+import { App, ExpressReceiver } from '@slack/bolt';
 import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
+import express from 'express';
 
 import initHandlers from './handlers';
 import { configMiddleware, initConfigMiddleware } from './middleware/config';
@@ -24,9 +25,13 @@ const healthCheck = () => {
 healthCheck();
 
 // Initializes your app with your bot token and signing secret
-const app = new App({
+const slackReceiver = new ExpressReceiver({
+    signingSecret: (process.env.SLACK_SIGNING_SECRET as string),
+    endpoints: { events: '/' }
+});
+const slackApp = new App({
     token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET
+    receiver: slackReceiver
 });
 
 // Initialize Github app connection
@@ -40,16 +45,22 @@ const githubApp = new Octokit({
     }
 });
 
+// Initialize express for custom endpoints
+const app = express();
+
 (async () => {
     // Setup middlewares first
     initConfigMiddleware();
     initGithubMiddleware(githubApp);
     // Use configMiddleware for every handler
-    app.use(configMiddleware);
+    slackApp.use(configMiddleware);
     // Add handlers to the app
-    initHandlers(app);
+    initHandlers(slackApp);
+    // Mount SlackApp to expected endpoint
+    app.use('/slack/events', slackReceiver.router);
+    app.get('/healthz', (req, res) => res.status(200).send('OK'));
     // Start your app
-    await app.start(process.env.PORT ? parseInt(process.env.PORT) : 3000);
-
-    console.log('⚡️ Bolt app is running!');
+    app.listen(process.env.PORT ? parseInt(process.env.PORT) : 3000, () => {
+        console.log('⚡️ Bolt app is running!');
+    });
 })();
