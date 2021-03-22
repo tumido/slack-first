@@ -127,22 +127,22 @@ const introduction = (supportChannelId) => ({
  */
 const helpMessage: Middleware<SlackCommandMiddlewareArgs> = async ({ say, message, context }) => {
     if (message.channel_type !== 'im') { return; }
-    await say(introduction(context.config.supportChannelId))
-}
+    await say(introduction(context.config.supportChannelId));
+};
 
 /**
  * Introduce when joining a channel
  * @param param0 Slack payload for event reactiop
  */
 const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, client, context }) => {
-    const auth = await client.auth.test()
-    if (!auth.ok || auth.user_id != event.user) { return; }
+    const auth = await client.auth.test();
+    if (!auth.ok || auth.user_id !== event.user) { return; }
 
     await client.chat.postMessage({
         channel: event.channel,
         ...introduction(context.config.supportChannelId),
-    })
-}
+    });
+};
 
 /**
  * Subscribe to events for misc

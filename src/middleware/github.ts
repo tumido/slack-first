@@ -10,7 +10,7 @@ var githubClient: (Octokit | undefined);
  */
 export const initGithubMiddleware = (client: Octokit) => {
     githubClient = client;
-}
+};
 
 /**
  * Middleware allowing the bot talk to GitHub
@@ -18,6 +18,6 @@ export const initGithubMiddleware = (client: Octokit) => {
  */
 export const githubMiddleware: Middleware<AnyMiddlewareArgs> = async ({ context, next }) => {
     context.github = githubClient;
-    if (next) await next();
-}
+    if (next) { await next(); }
+};
 

@@ -9,7 +9,7 @@ type Config = {
     supportChannelId: string
     onCall: string
     issueLabels: Array<string>
-}
+};
 
 /**
  * Load and parse YAML content of the config file
@@ -17,7 +17,7 @@ type Config = {
  */
 const loadConfig = (): Config => {
     return yaml.load(fs.readFileSync(configFileName).toString()) || {};
-}
+};
 
 var currentWatcher;
 var config;
@@ -33,27 +33,27 @@ export const initConfigMiddleware = (debounceTimeout = 100) => {
     const watchConfigFile = () => {
         return fs.watch(configFileName, (event, filename) => {
             if (!filename) {
-                console.log(`${filename}: watch was lost.`)
+                console.log(`${filename}: watch was lost.`);
                 return;
             }
             if (event === 'rename') {
                 // File was moved or replaced. Watch has to be restarted to watch on the intended path
-                console.log(`${filename}: watch has expired. Requeueing.`)
+                console.log(`${filename}: watch has expired. Requeueing.`);
                 currentWatcher.close();
                 currentWatcher = watchConfigFile();
                 return;
             }
             if (debounce) { return; }
-            debounce = true
-            setTimeout(() => { debounce = false }, 100);
+            debounce = true;
+            setTimeout(() => { debounce = false; }, debounceTimeout);
 
             console.log(`${filename}: changed. Reloading`);
             config = loadConfig();
-        })
-    }
+        });
+    };
     currentWatcher = watchConfigFile();
     config = loadConfig();
-}
+};
 
 /**
  * Middleware used to fetch the config file content and make it available to message handlers.
@@ -63,11 +63,11 @@ export const configMiddleware: Middleware<AnyMiddlewareArgs> = async ({ context,
     context.config = config;
 
     // Translate onCall email into a user ID
-    const user = await client.users.lookupByEmail({ 'email': context.config.onCall })
+    const user = await client.users.lookupByEmail({ 'email': context.config.onCall });
     if (user.ok) {
         context.onCallUser = user.user.id;
     }
 
-    if (next) await next();
-}
+    if (next) { await next(); }
+};
 

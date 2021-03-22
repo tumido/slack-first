@@ -11,5 +11,5 @@ const init = (app: App) => {
     github(app);
     misc(app);
     onCall(app);
-}
+};
 export default init;

@@ -6,9 +6,9 @@ import { App, Middleware, SlackEventMiddlewareArgs, SlackActionMiddlewareArgs, S
  * @param param0 Slack payload for message responses
  */
 const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<"message">> = async ({ message, client, context }) => {
-    if (message.channel != context.config.supportChannelId) {
+    if (message.channel !== context.config.supportChannelId) {
         return;
-    };
+    }
 
     await client.chat.postEphemeral({
         channel: message.channel,
@@ -68,21 +68,21 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
         const message = await client.chat.postMessage({
             channel: context.config.supportChannelId,
             text: `<@${context.onCallUser}>, you've been summoned to help, watch this thread please.`
-        })
+        });
         if (!message.ok) { return; }
 
         await client.chat.postMessage({
             channel: message.channel,
             thread_ts: message.ts,
             text: `<@${body.user.id}>, please describe your problem in this thread.`
-        })
+        });
 
     } else if (body.message?.thread_ts) {
         // Shortcut was used in a thread, reply to the thread
         await say({
             text: messageText(context.onCallUser, body.user.id),
             thread_ts: body.message.thread_ts
-        })
+        });
 
     } else {
         // Triggered as: Shortcut used on a message in a channel or Action in a dialog (button from onCallEphemeralMessage)
@@ -90,7 +90,7 @@ const tagOnCallAction: Middleware<SlackActionMiddlewareArgs<"message"> | SlackSh
             channel: body.channel.id,
             thread_ts: payload.value || body.message.ts,
             text: messageText(context.onCallUser, body.user_id || body.user.id)
-        })
+        });
 
         // Not activated by clicking a button in ephemeral message
         if (!payload.value) { return; }
@@ -107,7 +107,7 @@ const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, r
     await ack();
     // Respond to the command via ephemeral message
     await respond(`<@${context.onCallUser}> is the support person of the day! Please ask him in a DM or post a message in <#${context.config.supportChannelId}> channel`);
-}
+};
 
 /**
  * Subscribe to events for on-call actions
