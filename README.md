@@ -136,7 +136,14 @@ If you desire to run the bot locally in container, follow the [Run bot locally](
 
 ```sh
 npm run s2i:build
-podman run --env-file=.env -e SLACK_BOT_CONFIG=/mnt/config.yaml --mount type=bind,source=dev.config.yaml,dst=/mnt/config.yaml -p 3000:3000 slack-first:latest
+podman run \
+    --env-file=.env \
+    -e SLACK_BOT_CONFIG=/mnt/config.yaml \
+    -e GITHUB_PRIVATE_KEY=/mnt/github.pem \
+    --mount type=bind,source=dev.config.yaml,dst=/mnt/config.yaml \
+    --mount type=bind,source=github.pem,dst=/mnt/github.pem \
+    -p 3000:3000 \
+    slack-first:latest
 ```
 
 This launch method uses `npm start` command which runs the production build of the bot - Hot reloading is disabled.

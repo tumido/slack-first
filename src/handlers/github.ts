@@ -50,10 +50,10 @@ const expandMentions = (text: string, mentions: Array<MentionReplace>) => {
  * @param messages All messages in a thread
  * @returns Array of user mention replace guides
  */
-const resolveUserMentions = async (client: WebClient, messages: Array): Array<MentionReplace> => {
+const resolveUserMentions = async (client: WebClient, messages: Array): Promise<Array<MentionReplace>> => {
     const allUserMentionsSet = new Set(messages.flatMap(m => [m.user, ...(m.text.match(/(?<=<@).*?(?=>)/g) || [])]));
 
-    return await Promise.all(Array.from(allUserMentionsSet).map(async m => ({
+    return Promise.all(Array.from(allUserMentionsSet).map(async m => ({
         src: new RegExp(`<@${m}>`, 'g'),
         dst: await userNameLookup(client, m)
     })));
