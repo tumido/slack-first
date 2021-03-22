@@ -23,7 +23,8 @@
     "start": "node dist/app.js",
     "lint": "eslint src --ext ts",
     "dev": "concurrently \"tsc -w\" \"nodemon -r dotenv/config dist/app.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretest": "npm run build && npm run lint",
+    "test": "echo \"No test specified\"",
     "s2i:build": "mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-14 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest"
   },
   "devDependencies": {

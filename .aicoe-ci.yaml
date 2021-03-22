@@ -1,0 +1,9 @@
+check:
+  - thoth-build
+build:
+  base-image: "registry.access.redhat.com/ubi8/nodejs-14"
+  build-stratergy: Source
+  registry: quay.io
+  registry-org: operate-first
+  registry-project: slack-first
+  registry-secret: operate-first-pusher-secret
