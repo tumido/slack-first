@@ -20,13 +20,42 @@ Remote build:
 
 The bot can be configured via a local YAML config file. It watches for changes on this file and reflects the new config internally while running.
 
-Supported settings:
+Basic settings:
 
 ```yaml
 supportChannelId: ID_OF_SUPPORT_CHANNEL # e.g. C01RY7X79R9
 onCall: person-on-call-duty@example.com # Email address associated with a Slack account
 issueLabels: [question]
 ```
+
+### On-call configuration
+
+A person on call duty can be assingned either directly via:
+
+```yaml
+onCall: person-on-call-duty@example.com # Email address associated with a Slack account
+```
+
+Or a team can be scheduled using various rotation schemes:
+
+```yaml
+onCall:
+  schedule: daily|weekly
+  override: forced-person-on-call-duty@example.com
+  members:
+    - person1-on-call-duty@example.com
+    - person2-on-call-duty@example.com
+```
+
+Schedule value has to be exactly:
+
+- `daily`: Rotates through members list on daily basis
+- `weekly`: Rotates the on-call duty person every week
+
+Known limitations:
+
+- Exchanging duties/re-scheduling is possible only via reordering the `members` list or via `override`
+- `daily` rotation works with 7 days long weeks only. That means people will be scheduled/rotated for weekends as well. 
 
 ## Features
 
