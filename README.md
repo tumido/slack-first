@@ -25,7 +25,6 @@ Basic settings:
 ```yaml
 supportChannelId: ID_OF_SUPPORT_CHANNEL # e.g. C01RY7X79R9
 onCall: person-on-call-duty@example.com # Email address associated with a Slack account
-issueLabels: [question]
 ```
 
 ### On-call configuration
@@ -55,7 +54,30 @@ Schedule value has to be exactly:
 Known limitations:
 
 - Exchanging duties/re-scheduling is possible only via reordering the `members` list or via `override`
-- `daily` rotation works with 7 days long weeks only. That means people will be scheduled/rotated for weekends as well. 
+- `daily` rotation works with 7 days long weeks only. That means people will be scheduled/rotated for weekends as well.
+
+### Github configuration
+
+By default the bot can file issues to all repositories you grant it access to.
+
+If you wish to restrict it, you can whitelist repositories for this feature declaratively, per channel:
+
+```yaml
+github:
+  issues:
+    access:
+      - organization/repo
+      - organization/repo2
+```
+
+Additionally, the labels for newly opened issues can be configured as well:
+
+```yaml
+github:
+  issues:
+    labels:
+      - label3
+```
 
 ## Features
 

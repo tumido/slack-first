@@ -11,10 +11,18 @@ type OnCallConfig = (string | {
     override: string
     members: Array<string>
 });
+
+type GithubConfig = {
+    issues: {
+        labels: Array<string>
+        access: Array<string>
+    }
+};
+
 export type Config = {
     supportChannelId: string
     onCall: OnCallConfig
-    issueLabels: Array<string>
+    github: GithubConfig
 };
 
 

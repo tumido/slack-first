@@ -3,6 +3,7 @@ import { App, Middleware, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs }
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
+import { Config, GithubConfig } from '../middleware/config';
 
 /**
  * Lookup user name from Slack user ID
@@ -95,10 +96,17 @@ const issueBodyGenerator = async (client: WebClient, messages: Array, permalink:
 /**
  * List of GitHub repositories the bot has access to
  * @param github Octokit GitHub client
+ * @param config Bot configuration
  * @returns List of repository names
  */
-const fetchRepos = async (github: Octokit) => {
+const fetchRepos = async (github: Octokit, config: GithubConfig) => {
+    if (config?.issues?.access && Array.isArray(config.issues.access)) {
+        // Repositories are listed in the config file
+        return config.issues.access;
+    }
+
     try {
+        // Lookup all repositories
         const repos = await github.apps.listReposAccessibleToInstallation();
         return repos.data.repositories.map(r => r.full_name);
     } catch (e) {
@@ -148,8 +156,12 @@ const fetchThreadBody = async (body, client: WebClient) => {
  */
 const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, context, client, ack }) => {
     await ack();
-    const { github }: { github: Octokit } = context;
-    const [issueBody, repos] = await Promise.all([fetchThreadBody(body, client), fetchRepos(github)]);
+    const { github, config: { github: ghConfig } }: { github: Octokit, config: Config } = context;
+
+    const [issueBody, repos] = await Promise.all([
+        fetchThreadBody(body, client),
+        fetchRepos(github, ghConfig)
+    ]);
 
     const ts = body.message.thread_ts || body.message_ts;
     await client.views.open({

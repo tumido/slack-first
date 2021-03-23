@@ -6,5 +6,13 @@ metadata:
 data:
   config.yaml: |
     supportChannelId: C01RY7X79R9
-    onCall: qgzscsdqiaipryerya@twzhhq.com
-    issueLabels: [question]
+    onCall:
+      schedule: weekly
+      members:
+        - qgzscsdqiaipryerya@twzhhq.com
+        - xucosycqekvlwcexvi@upived.online
+    github:
+      issues:
+        access:
+          - tumido/slack-first
+        labels: [question]
