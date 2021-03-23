@@ -148,7 +148,7 @@ const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, cl
  * Subscribe to events for misc
  * @param app Slack App
  */
-const init = (app: App) => {
+const init = (app: App): void => {
     app.action('dismiss_message', dismissMessage);
     app.event('member_joined_channel', introduceOnJoin);
     app.message('help', helpMessage);

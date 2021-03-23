@@ -1,14 +1,13 @@
 import { Octokit } from '@octokit/rest';
 import { Middleware, AnyMiddlewareArgs } from '@slack/bolt';
 
-
-var githubClient: (Octokit | undefined);
+let githubClient: (Octokit | undefined);
 
 /**
  * GitHub middleware initializer
  * @param client GitHub client
  */
-export const initGithubMiddleware = (client: Octokit) => {
+export const initGithubMiddleware = (client: Octokit): void => {
     githubClient = client;
 };
 

@@ -19,8 +19,8 @@ const loadConfig = (): Config => {
     return yaml.load(fs.readFileSync(configFileName).toString()) || {};
 };
 
-var currentWatcher;
-var config;
+let currentWatcher;
+let config;
 
 /**
  * Config middleware initializer
@@ -28,7 +28,7 @@ var config;
  * Starts the file watch for config changes or file changes using fs.watch. This uses Inotify, therefore it has to be requeued if the file is moved
  * @param debounceTime fs.watch can trigger multiple events for a single change. Debounce reduces the noise.
  */
-export const initConfigMiddleware = (debounceTimeout = 100) => {
+export const initConfigMiddleware = (debounceTimeout = 100): void => {
     let debounce = false;
     const watchConfigFile = () => {
         return fs.watch(configFileName, (event, filename) => {

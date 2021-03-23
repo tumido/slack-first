@@ -252,7 +252,7 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
  * Subscribe to events for GitHub
  * @param app Slack App
  */
-const init = (app: App) => {
+const init = (app: App): void => {
     app.shortcut('open_issue_for_thread', githubMiddleware, createModal);
     app.view('open_issue', githubMiddleware, openIssue);
 };

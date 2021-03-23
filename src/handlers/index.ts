@@ -7,7 +7,7 @@ import { App } from '@slack/bolt';
  * Distribute subscription to all handlers in the package
  * @param app Slack App
  */
-const init = (app: App) => {
+const init = (app: App): void => {
     github(app);
     misc(app);
     onCall(app);
