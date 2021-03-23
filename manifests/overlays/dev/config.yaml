@@ -1,0 +1,11 @@
+supportChannelId: C01RY7X79R9
+onCall:
+  schedule: weekly
+  members:
+    - qgzscsdqiaipryerya@twzhhq.com
+    - xucosycqekvlwcexvi@upived.online
+github:
+  issues:
+    access:
+      - tumido/slack-first
+    labels: [question]

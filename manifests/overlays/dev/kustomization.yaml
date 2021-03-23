@@ -10,3 +10,9 @@ patchesStrategicMerge:
 
 generators:
   - secret-generator.yaml
+
+configMapGenerator:
+  - name: slack-first
+    behavior: merge
+    files:
+      - config.yaml
