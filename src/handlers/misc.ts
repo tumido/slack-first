@@ -131,17 +131,63 @@ const helpMessage: Middleware<SlackCommandMiddlewareArgs> = async ({ say, messag
 };
 
 /**
- * Introduce when joining a channel
+ * Ask if the bot should introduce when joining a channel
  * @param param0 Slack payload for event reactiop
  */
-const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, client, context }) => {
+const askIfShouldIntroduce: Middleware<SlackEventMiddlewareArgs> = async ({ event, client }) => {
     const auth = await client.auth.test();
-    if (!auth.ok || auth.user_id !== event.user) { return; }
+    if (!auth.ok || auth.user_id !== event.user || !event.inviter) { return; }
 
-    await client.chat.postMessage({
+
+    await client.chat.postEphemeral({
         channel: event.channel,
+        text: "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel.",
+        blocks: [
+            {
+                type: "section",
+                text: {
+                    type: "mrkdwn",
+                    text: "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel. Would you like me to introduce myself to others?"
+                },
+            },
+            {
+                type: 'actions',
+                elements: [
+                    {
+                        type: "button",
+                        text: {
+                            type: "plain_text",
+                            text: `Please introduce yourself`
+                        },
+                        action_id: "introduce_bot",
+                        style: "primary",
+                    },
+                    {
+                        type: "button",
+                        text: {
+                            type: "plain_text",
+                            text: "Dismiss message"
+                        },
+                        action_id: "dismiss_message",
+                    }
+                ]
+            },
+        ],
+        user: event.inviter
+    });
+};
+
+
+/**
+ * Post introduction message in response to an action
+ * @param param0 Slack payload for responding to an action
+ */
+const introduceBot: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ ack, say, respond, context }) => {
+    await ack();
+    await say({
         ...introduction(context.config.supportChannelId),
     });
+    await respond({ delete_original: true });
 };
 
 /**
@@ -150,7 +196,8 @@ const introduceOnJoin: Middleware<SlackEventMiddlewareArgs> = async ({ event, cl
  */
 const init = (app: App): void => {
     app.action('dismiss_message', dismissMessage);
-    app.event('member_joined_channel', introduceOnJoin);
+    app.action('introduce_bot', introduceBot);
+    app.event('member_joined_channel', askIfShouldIntroduce);
     app.message('help', helpMessage);
 };
 export default init;
