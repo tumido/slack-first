@@ -1,4 +1,4 @@
-import onCall from './on-call-actions';
+import onCall from './on-call';
 import misc from './misc';
 import github from './github';
 import { App } from '@slack/bolt';
