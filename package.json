@@ -79,7 +79,7 @@
             "strictCamelCase"
           ],
           "filter": {
-            "regex": "thread_ts|(_id$)|private_metadata|initial_value|message_ts|delete_original|image_url|alt_text",
+            "regex": "thread_ts|(_id$)|private_metadata|initial_value|message_ts|delete_original|image_url|alt_text|min_query_length",
             "match": false
           }
         }

@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { App, Middleware, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs } from '@slack/bolt';
+import { App, Middleware, SlackOptionsMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs } from '@slack/bolt';
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
-import { Config, GithubConfig } from '../middleware/config';
+import { GithubConfig } from '../middleware/config';
 
 /**
  * Lookup user name from Slack user ID
@@ -94,28 +94,6 @@ const issueBodyGenerator = async (client: WebClient, messages: Array, permalink:
 };
 
 /**
- * List of GitHub repositories the bot has access to
- * @param github Octokit GitHub client
- * @param config Bot configuration
- * @returns List of repository names
- */
-const fetchRepos = async (github: Octokit, config: GithubConfig) => {
-    if (config?.issues?.access && Array.isArray(config.issues.access)) {
-        // Repositories are listed in the config file
-        return config.issues.access;
-    }
-
-    try {
-        // Lookup all repositories
-        const repos = await github.apps.listReposAccessibleToInstallation();
-        return repos.data.repositories.map(r => r.full_name);
-    } catch (e) {
-        console.error(e);
-        return [];
-    }
-};
-
-/**
  * Fetch all messages in a given thread, return as a formatted string
  * @param body Shortcut action middleware body
  * @param client Slack client
@@ -151,17 +129,48 @@ const fetchThreadBody = async (body, client: WebClient) => {
 };
 
 /**
+ * List of GitHub repositories the bot has access to
+ * @param param0 Slack payload for loading external options event
+ * @returns List of repository names
+ */
+const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context }) => {
+    const { github, config: { github: ghConfig } }: { github: Octokit, ghCnfig: GithubConfig } = context;
+
+    let repos = [];
+    if (ghConfig?.issues?.access && Array.isArray(ghConfig.issues.access)) {
+        // Repositories are listed in the config file
+        repos = ghConfig.issues.access;
+    } else {
+        try {
+            // Lookup all repositories
+            const ghRepos = await github.apps.listReposAccessibleToInstallation();
+            repos = ghRepos.data.repositories.map(r => r.full_name);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    await ack({
+        options: repos.map(r => ({
+            text: {
+                type: "plain_text",
+                text: r
+            },
+            value: r
+        }))
+    });
+
+    return;
+};
+
+/**
  * Create modal for GitHub issue creation
  * @param param0 Slack payload for shortcut action
  */
-const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, context, client, ack }) => {
+const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
     await ack();
-    const { github, config: { github: ghConfig } }: { github: Octokit, config: Config } = context;
 
-    const [issueBody, repos] = await Promise.all([
-        fetchThreadBody(body, client),
-        fetchRepos(github, ghConfig)
-    ]);
+    const issueBody = await fetchThreadBody(body, client);
 
     const ts = body.message.thread_ts || body.message_ts;
     await client.views.open({
@@ -183,19 +192,13 @@ const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, cont
                         text: "Repository",
                     },
                     element: {
-                        type: "static_select",
+                        type: "external_select",
                         placeholder: {
                             type: "plain_text",
-                            text: "Select an item",
+                            text: "Select a repository",
                         },
-                        options: repos.map(r => ({
-                            text: {
-                                type: "plain_text",
-                                text: r
-                            },
-                            value: r
-                        })),
-                        action_id: "repo_select"
+                        action_id: "repo_select",
+                        min_query_length: 0
                     },
                 },
                 {
@@ -266,6 +269,7 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
  */
 const init = (app: App): void => {
     app.shortcut('open_issue_for_thread', githubMiddleware, createModal);
+    app.options('repo_select', githubMiddleware, fetchRepos);
     app.view('open_issue', githubMiddleware, openIssue);
 };
 export default init;
