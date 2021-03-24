@@ -224,7 +224,8 @@ This launch method uses `npm start` command which runs the production build of t
 
    1. Toggle _Interactivity_
    2. Set _Request URL_ to the Bot URL obtained from Ngrok.
-   3. Add following shortcuts via _Create New Shortcut_ button:
+   3. Set _Options Load URL_ in the _Select Menus_ section to the Bot URL obtained from Ngrok.
+   4. Add following shortcuts via _Create New Shortcut_ button:
 
       | Name         | Scope   | Description                                 | Callback ID             |
       | ------------ | ------- | ------------------------------------------- | ----------------------- |
@@ -232,7 +233,7 @@ This launch method uses `npm start` command which runs the production build of t
       | Ask for help | Message | Get help from a support person on-call duty | `tag_on_call_person`    |
       | Create issue | Message | Creates an issue from a thread or a message | `open_issue_for_thread` |
 
-   4. _Save Changes_
+   5. _Save Changes_
 
 5. Setup commands on _Slash Commands_ tab via _Create New Command_ dialog:
 
