@@ -1,3 +1,20 @@
+# [1.1.0](https://github.com/tumido/slack-first/compare/v1.0.1...v1.1.0) (2021-03-24)
+
+
+### Bug Fixes
+
+* Use Prettier for TypeScript ([5ba8577](https://github.com/tumido/slack-first/commit/5ba85776c923c0c12bf773845e3544055b923662))
+
+
+### Features
+
+* Add deployment manifests ([6e03564](https://github.com/tumido/slack-first/commit/6e035649aee6b25a5a3fdb7115dcba722abcbbc9))
+* Add healthz endpoint ([c59503e](https://github.com/tumido/slack-first/commit/c59503e3c99cfce5767572bd4693c35b9d9a90bb))
+* Enable schedulling for on-call duty ([4a00359](https://github.com/tumido/slack-first/commit/4a003590298901b3ae2081897cfa812d784fc663))
+* Load github repositories externally - on modal input ([3752409](https://github.com/tumido/slack-first/commit/37524092646d6009367916a04c713895d2055509))
+* Polish the introduction experience ([965fd00](https://github.com/tumido/slack-first/commit/965fd00094b07c3cdb2c6277ff3927d70f2c3900))
+* Support declarative repositories ([3e32893](https://github.com/tumido/slack-first/commit/3e32893605bd14248741e51b70e417edd7299825))
+
 ## [1.0.1](https://github.com/tumido/slack-first/compare/v1.0.0...v1.0.1) (2021-03-22)
 
 
