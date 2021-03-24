@@ -134,7 +134,7 @@ const fetchThreadBody = async (body, client: WebClient) => {
  * @returns List of repository names
  */
 const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context }) => {
-    const { github, config: { github: ghConfig } }: { github: Octokit, ghCnfig: GithubConfig } = context;
+    const { github: gh, config: { github: ghConfig } }: { github: Octokit, ghCnfig: GithubConfig } = context;
 
     let repos = [];
     if (ghConfig?.issues?.access && Array.isArray(ghConfig.issues.access)) {
@@ -143,7 +143,7 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
     } else {
         try {
             // Lookup all repositories
-            const ghRepos = await github.apps.listReposAccessibleToInstallation();
+            const ghRepos = await gh.apps.listReposAccessibleToInstallation();
             repos = ghRepos.data.repositories.map(r => r.full_name);
         } catch (e) {
             console.error(e);
@@ -241,12 +241,12 @@ const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, clie
  */
 const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, context, client, ack }) => {
     await ack();
-    const { github }: { github: Octokit } = context;
+    const { github: gh }: { github: Octokit } = context;
 
     const [owner, repo] = view.state.values.repo.repo_select.selected_option.value.split('/');
     const [thread_ts, channel] = body.view.private_metadata.split("|");
 
-    const issue = await github.issues.create({
+    const issue = await gh.issues.create({
         owner,
         repo,
         title: view.state.values.title.title.value,
