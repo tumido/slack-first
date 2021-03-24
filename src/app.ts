@@ -2,7 +2,6 @@ import fs from 'fs';
 import { App, ExpressReceiver } from '@slack/bolt';
 import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
-import express from 'express';
 
 import initHandlers from './handlers';
 import { configMiddleware, initConfigMiddleware } from './middleware/config';
@@ -27,7 +26,6 @@ healthCheck();
 // Initializes your app with your bot token and signing secret
 const slackReceiver = new ExpressReceiver({
     signingSecret: (process.env.SLACK_SIGNING_SECRET as string),
-    endpoints: { events: '/' }
 });
 const slackApp = new App({
     token: process.env.SLACK_BOT_TOKEN,
@@ -46,22 +44,23 @@ const githubApp = new Octokit({
 });
 
 // Initialize express for custom endpoints
-const app = express();
-app.disable("x-powered-by"); // https://sonarcloud.io/project/security_hotspots?id=tumido_slack-first&hotspots=AXhhsCuTV4OlGYpDAuyk
+slackReceiver.app.disable("x-powered-by"); // https://sonarcloud.io/project/security_hotspots?id=tumido_slack-first&hotspots=AXhhsCuTV4OlGYpDAuyk
 
+// Setup middlewares first
+initConfigMiddleware();
+initGithubMiddleware(githubApp);
+
+// Use configMiddleware for every handler
+slackApp.use(configMiddleware);
+
+// Add handlers to the app
+initHandlers(slackApp);
+
+// Mount additional endpoint for health check
+slackReceiver.router.get('/healthz', (_req, res) => res.status(200).send('OK'));
+
+// Start your app
 (async () => {
-    // Setup middlewares first
-    initConfigMiddleware();
-    initGithubMiddleware(githubApp);
-    // Use configMiddleware for every handler
-    slackApp.use(configMiddleware);
-    // Add handlers to the app
-    initHandlers(slackApp);
-    // Mount SlackApp to expected endpoint
-    app.use('/slack/events', slackReceiver.router);
-    app.get('/healthz', (req, res) => res.status(200).send('OK'));
-    // Start your app
-    app.listen(process.env.PORT ? parseInt(process.env.PORT) : 3000, () => {
-        console.log('⚡️ Bolt app is running!');
-    });
+    await slackApp.start(process.env.PORT ? parseInt(process.env.PORT) : 3000);
+    console.log('⚡️ Bolt app is running!');
 })();
