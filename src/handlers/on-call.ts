@@ -113,10 +113,10 @@ const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({ ack, r
  * Subscribe to events for on-call actions
  * @param app Slack App
  */
-export const init = (app: App): void => {
+export const onCall = (app: App): void => {
     app.message('?', onCallEphemeralMessage);
     app.action('tag_on_call_person', tagOnCallAction);
     app.shortcut('tag_on_call_person', tagOnCallAction);
     app.command('/oncall', tagOnCallCommand);
 };
-export default init;
+export default onCall;

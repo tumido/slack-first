@@ -47,6 +47,7 @@ const githubApp = new Octokit({
 
 // Initialize express for custom endpoints
 const app = express();
+app.disable("x-powered-by"); // https://sonarcloud.io/project/security_hotspots?id=tumido_slack-first&hotspots=AXhhsCuTV4OlGYpDAuyk
 
 (async () => {
     // Setup middlewares first

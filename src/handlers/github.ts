@@ -117,14 +117,14 @@ const fetchThreadBody = async (body, client: WebClient) => {
         if (!thread.ok || !permalink.ok) {
             console.error('Failed to get whole conversation');
         }
-        return await issueBodyGenerator(client, thread.messages, permalink.permalink);
+        return issueBodyGenerator(client, thread.messages, permalink.permalink);
     } else {
         // Triggered on a message without a thread - directly in a channel
         const permalink = await client.chat.getPermalink({
             channel: body.channel.id,
             message_ts: body.message_ts
         });
-        return await issueBodyGenerator(client, [body.message], permalink.permalink);
+        return issueBodyGenerator(client, [body.message], permalink.permalink);
     }
 };
 
@@ -159,8 +159,6 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
             value: r
         }))
     });
-
-    return;
 };
 
 /**
@@ -267,9 +265,9 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
  * Subscribe to events for GitHub
  * @param app Slack App
  */
-const init = (app: App): void => {
+const github = (app: App): void => {
     app.shortcut('open_issue_for_thread', githubMiddleware, createModal);
     app.options('repo_select', githubMiddleware, fetchRepos);
     app.view('open_issue', githubMiddleware, openIssue);
 };
-export default init;
+export default github;

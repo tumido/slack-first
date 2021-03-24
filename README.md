@@ -1,8 +1,9 @@
-<img src="https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/avatar_rounded.png" width="100" height="100">
-
-# 1st Operator
+# <img src="https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/avatar_rounded.png" height="30px"> The First Operator
 
 ![depedencies](https://david-dm.org/tumido/slack-first.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tumido_slack-first&metric=alert_status)](https://sonarcloud.io/dashboard?id=tumido_slack-first)
+[![Build](https://github.com/tumido/slack-first/actions/workflows/push.yaml/badge.svg)](https://github.com/tumido/slack-first/actions/workflows/push.yaml)
+[![Release](https://github.com/tumido/slack-first/actions/workflows/release-issue.yaml/badge.svg)](https://github.com/tumido/slack-first/actions/workflows/release-issue.yaml)
 
 ## Build requirements
 
@@ -51,6 +52,8 @@ Schedule value has to be exactly:
 - `daily`: Rotates through members list on daily basis
 - `weekly`: Rotates the on-call duty person every week
 
+Seting a value to the `override` property forces duty for this user. This property is optional and if set the bot behaves the same as with `onCall: person-on-call-duty@example.com` settings.
+
 Known limitations:
 
 - Exchanging duties/re-scheduling is possible only via reordering the `members` list or via `override`
@@ -60,7 +63,7 @@ Known limitations:
 
 By default the bot can file issues to all repositories you grant it access to.
 
-If you wish to restrict it, you can whitelist repositories for this feature declaratively, per channel:
+If you wish to restrict it, you can whitelist repositories for this feature declaratively:
 
 ```yaml
 github:

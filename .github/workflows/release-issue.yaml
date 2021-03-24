@@ -1,4 +1,4 @@
-name: Release issue
+name: Release
 
 on:
   issues:

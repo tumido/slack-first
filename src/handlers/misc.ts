@@ -194,10 +194,10 @@ const introduceBot: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ 
  * Subscribe to events for misc
  * @param app Slack App
  */
-const init = (app: App): void => {
+const misc = (app: App): void => {
     app.action('dismiss_message', dismissMessage);
     app.action('introduce_bot', introduceBot);
     app.event('member_joined_channel', askIfShouldIntroduce);
     app.message('help', helpMessage);
 };
-export default init;
+export default misc;

@@ -71,26 +71,32 @@ export const initConfigMiddleware = (debounceTimeout = 100): void => {
 };
 
 /**
+ * Decide which pivot function to use for scheduling on-call duty
+ * @param schedule Schedule type identifier. Either "daily" or "weekly"
+ * @returns Schedule pivot function
+ */
+const onCallPivot = (schedule: string): (function | void) => {
+    if (schedule === 'daily') { return getDayOfYear; }
+    if (schedule === 'weekly') { return getWeek; }
+};
+
+/**
  * Resolve which member is on call duty right now
- * @param config On-call section of the configuration file
+ * @param onCallConfig On-call section of the configuration file
  * @returns Member from the config currently on duty
  */
-const getOnCallUser = (config: OnCallConfig): (string | void) => {
-    if (typeof config === 'string') { return config; }
-    if (config.override) { return config.override; }
+const getOnCallUser = (onCallConfig: OnCallConfig): (string | void) => {
+    if (typeof onCallConfig === 'string') { return onCallConfig; }
+    if (onCallConfig.override) { return onCallConfig.override; }
 
-    const metric = (config.schedule === 'daily')
-        ? getDayOfYear
-        : (config.schedule === 'weekly')
-            ? getWeek
-            : undefined;
+    const pivot = onCallPivot(onCallConfig.schedule);
 
-    if (!metric) {
+    if (!pivot) {
         console.error("Invalid schedule type for onCall schedule. Must be 'daily' or 'weekly'");
         return;
     }
 
-    return config.members[metric(new Date()) % config.members.length];
+    return onCallConfig.members[pivot(new Date()) % onCallConfig.members.length];
 };
 
 /**
