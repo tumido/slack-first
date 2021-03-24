@@ -128,6 +128,6 @@ jobs:
       - name: Close Issue
         uses: peter-evans/close-issue@v1
         with:
-          issue-number: ${{ github.event.client_payload.github.event.issue.number }}
+          issue-number: ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,6 +4,8 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tumido_slack-first&metric=alert_status)](https://sonarcloud.io/dashboard?id=tumido_slack-first)
 [![Build](https://github.com/tumido/slack-first/actions/workflows/push.yaml/badge.svg)](https://github.com/tumido/slack-first/actions/workflows/push.yaml)
 [![Release](https://github.com/tumido/slack-first/actions/workflows/release-issue.yaml/badge.svg)](https://github.com/tumido/slack-first/actions/workflows/release-issue.yaml)
+![GitHub](https://img.shields.io/github/license/tumido/slack-first?color=blue)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tumido/slack-first)
 
 ## Build requirements
 
