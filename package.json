@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@octokit/auth-app": "^3.3.0",
-    "@octokit/rest": "^18.5.0",
+    "@octokit/rest": "^18.5.2",
     "@slack/bolt": "^3.3.0",
     "date-fns": "^2.19.0",
     "eslint": "^7.22.0",
