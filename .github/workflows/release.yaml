@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  repository_dispatch:
+    types: [trigger-release]
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.client_payload.github.event.issue.number }}
+          comment-id: ${{ github.event.client_payload.commentId }}
+          body: |
+            🎁 Publishing to Quay.io...
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: S2I Build
+        uses: redhat-actions/s2i-build@v1
+        with:
+          path_context: "."
+          builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
+          image_name: slack-first
+          image_tag: ${{ github.event.client_payload.releaseVersion }}
+
+      - name: Push To Quay Action
+        uses: redhat-actions/push-to-registry@v1
+        with:
+          image: slack-first
+          tag: ${{ github.event.client_payload.releaseVersion }}
+          registry: quay.io/tcoufal
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.client_payload.github.event.issue.number }}
+          comment-id: ${{ github.event.client_payload.commentId }}
+          body: |
+            🎉 Released!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Close Issue
+        uses: peter-evans/close-issue@v1
+        with:
+          issue-number: ${{ github.event.client_payload.github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

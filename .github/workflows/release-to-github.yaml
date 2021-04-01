@@ -1,4 +1,4 @@
-name: Release
+name: Release to Github
 
 on:
   issues:
@@ -78,9 +78,25 @@ jobs:
       - name: Run test
         run: npm test
 
+  build:
+    name: Build
+    needs: check-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup and Build
+        uses: redhat-actions/s2i-build@v1
+        with:
+          path_context: "."
+          builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
+          image_name: slack-first
+          image_tag: test
+
   release:
     name: Release
-    needs: [check-release, test]
+    needs: [test, build]
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
@@ -116,6 +132,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Trigger "Release" workflow if new release was created
+        uses: peter-evans/repository-dispatch@v1
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          event-type: trigger-release
+          client-payload: '{"github": ${{ toJson(github) }},"commentId": "${{ needs.check-release.outputs.commentId }}", "releaseVersion": "${{ steps.semantic.outputs.new_release_version }}" }'
+
       - name: Update comment
         uses: peter-evans/create-or-update-comment@v1
         if: steps.semantic.outputs.new_release_published != 'true'
@@ -127,19 +151,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update comment
-        uses: peter-evans/create-or-update-comment@v1
-        if: steps.semantic.outputs.new_release_published == 'true'
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          comment-id: ${{ needs.check-release.outputs.commentId }}
-          body: |
-            🎉 Released!
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Close Issue
         uses: peter-evans/close-issue@v1
+        if: steps.semantic.outputs.new_release_published != 'true'
         with:
           issue-number: ${{ github.event.issue.number }}
         env:

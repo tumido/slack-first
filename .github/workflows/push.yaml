@@ -1,4 +1,4 @@
-name: Build
+name: Push
 
 on:
   push:
@@ -31,3 +31,18 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: S2I Build
+        uses: redhat-actions/s2i-build@v1
+        with:
+          path_context: "."
+          builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
+          image_name: slack-first
+          image_tag: test
