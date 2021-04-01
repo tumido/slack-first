@@ -1,8 +1,8 @@
 // @ts-nocheck
-import fs from 'fs';
-import yaml from 'js-yaml';
 import { Middleware, AnyMiddlewareArgs } from '@slack/bolt';
 import { getWeek, getDayOfYear } from 'date-fns';
+import watch from 'node-watch';
+import { loadYaml } from '../helpers/fs';
 
 const configFileName = process.env.SLACK_BOT_CONFIG as string;
 
@@ -26,48 +26,19 @@ export type Config = {
 };
 
 
-/**
- * Load and parse YAML content of the config file
- * @returns Content of the config file
- */
-const loadConfig = (): Config => {
-    return yaml.load(fs.readFileSync(configFileName).toString()) || {};
-};
-
-let currentWatcher;
-let config;
+let config = loadYaml(configFileName);
 
 /**
  * Config middleware initializer
  * 
- * Starts the file watch for config changes or file changes using fs.watch. This uses Inotify, therefore it has to be requeued if the file is moved
- * @param debounceTime fs.watch can trigger multiple events for a single change. Debounce reduces the noise.
+ * Starts the file watch for config changes or file changes using node-watch.
  */
-export const initConfigMiddleware = (debounceTimeout = 100): void => {
-    let debounce = false;
-    const watchConfigFile = () => {
-        return fs.watch(configFileName, (event, filename) => {
-            if (!filename) {
-                console.log(`${filename}: watch was lost.`);
-                return;
-            }
-            if (event === 'rename') {
-                // File was moved or replaced. Watch has to be restarted to watch on the intended path
-                console.log(`${filename}: watch has expired. Requeueing.`);
-                currentWatcher.close();
-                currentWatcher = watchConfigFile();
-                return;
-            }
-            if (debounce) { return; }
-            debounce = true;
-            setTimeout(() => { debounce = false; }, debounceTimeout);
-
-            console.log(`${filename}: changed. Reloading`);
-            config = loadConfig();
-        });
-    };
-    currentWatcher = watchConfigFile();
-    config = loadConfig();
+export const initConfigMiddleware = (): void => {
+    const watcher = watch(configFileName);
+    watcher.on('change', () => {
+        console.log(`${configFileName}: changed. Reloading`);
+        config = loadYaml(configFileName);
+    });
 };
 
 /**

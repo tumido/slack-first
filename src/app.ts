@@ -6,11 +6,13 @@ import { createAppAuth } from '@octokit/auth-app';
 import initHandlers from './handlers';
 import { configMiddleware, initConfigMiddleware } from './middleware/config';
 import { initGithubMiddleware } from './middleware/github';
+import { initDbMiddleware, setKey, getKey } from './middleware/database';
 
+const scopes = ['channels:history', 'channels:read', 'chat:write', 'commands', 'groups:history', 'groups:read', 'im:history', 'mpim:history', 'users:read', 'users:read.email'];
 
 const healthCheck = () => {
     try {
-        if (!process.env.SLACK_BOT_TOKEN) { throw Error('SLACK_BOT_TOKEN: Token not set'); }
+        // if (!process.env.SLACK_BOT_TOKEN) { throw Error('SLACK_BOT_TOKEN: Token not set'); }
         if (!process.env.SLACK_SIGNING_SECRET) { throw Error('SLACK_SIGNING_SECRET: Secret not set'); }
         if (!process.env.SLACK_BOT_CONFIG) { throw Error('SLACK_BOT_CONFIG: Path to config not set'); }
         if (!process.env.GITHUB_APP_ID) { throw Error('GITHUB_APP_ID: App ID not set'); }
@@ -22,13 +24,35 @@ const healthCheck = () => {
     }
 };
 healthCheck();
+initDbMiddleware();
 
 // Initializes your app with your bot token and signing secret
 const slackReceiver = new ExpressReceiver({
     signingSecret: (process.env.SLACK_SIGNING_SECRET as string),
+    clientId: process.env.SLACK_CLIENT_ID,
+    clientSecret: process.env.SLACK_CLIENT_SECRET,
+    scopes,
+    stateSecret: 'my-state-secret',
+    installationStore: {
+        storeInstallation: async (installation) => {
+            if (installation.isEnterpriseInstall && installation?.enterprise?.id) {
+                setKey((installation?.enterprise?.id as string), installation);
+            } else {
+                setKey((installation?.team?.id as string), installation);
+            }
+        },
+        fetchInstallation: async (installQuery) => {
+            if (installQuery.isEnterpriseInstall && installQuery.enterpriseId !== undefined) {
+                return getKey(installQuery.enterpriseId);
+            }
+            if (installQuery.teamId !== undefined) {
+                return getKey(installQuery.teamId);
+            }
+            throw new Error('Failed fetching installation');
+        },
+    },
 });
 const slackApp = new App({
-    token: process.env.SLACK_BOT_TOKEN,
     receiver: slackReceiver
 });
 
