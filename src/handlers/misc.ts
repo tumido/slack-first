@@ -11,115 +11,80 @@ const dismissMessage: Middleware<SlackActionMiddlewareArgs<"message">> = async (
 };
 
 /**
+ * Helper for outlining all supported features
+ * @param supportChannelId Channel ID
+ * @returns List of features
+ */
+const featureList = (supportChannelId: string) => ([
+    {
+        text: "*1️⃣ Use the `/oncall` command*.\nType `/oncall` and I'll tell you who is the dedicated support person on call duty for today.",
+        imageUrl: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/oncall_command.png",
+        imageTitle: "oncall_command"
+    },
+    {
+        text: `*2️⃣ Ask a question at <#${supportChannelId}>.*\nIf I can sense a question in this channel's main thread, it will offer you to tag the person on call duty for the day. I will open a new conversation in a thread to your original message.`,
+        imageUrl: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png",
+        imageTitle: "support_channel_question"
+    },
+    {
+        text: "*3️⃣ Use the _Ask for help_ action.*\nIf you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_).",
+        imageUrl: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif",
+        imageTitle: "message_shortcut"
+    },
+    {
+        text: "*4️⃣ Use the _Ask for help_ shortcut.*\nIf you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu.",
+        imageUrl: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif",
+        imageTitle: "global_shortcut"
+    },
+    {
+        text: "*5️⃣ Use the _Create issue_ shortcut.*\nIf you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).",
+        imageUrl: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif",
+        imageTitle: "github_issue"
+    },
+]);
+
+/**
  * Message posted as an introduction or help
  * @param supportChannelId ID of a support channel from the configuration file
  * @returns Message content
  */
-const introduction = (supportChannelId) => ({
-    text: "Hey there 👋 I'm your 1st Operator.",
-    blocks: [
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: "Hey there 👋 I'm your 1st Operator. I'm here to help you operate and reach support for Operate First in Slack.\nThere multiple ways you can use my services:"
-            },
-        },
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: "*1️⃣ Use the `/oncall` command*. Type `/oncall` and I'll tell you who is the dedicated support person on call duty for today."
-            }
-        },
-        {
-            type: "image",
-            title: {
-                type: "plain_text",
-                text: "oncall_command",
-                emoji: true
-            },
-            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/oncall_command.png",
-            alt_text: "oncall_command"
-        },
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: `*2️⃣ Ask a question at <#${supportChannelId}>.* If I can sense a question in this channel's main thread, it will offer you to tag the person on call duty for the day. I will open a new conversation in a thread to your original message.`
-            }
-        },
-        {
-            type: "image",
-            title: {
-                type: "plain_text",
-                text: "support_channel_question"
-            },
-            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png",
-            alt_text: "support_channel_question"
-        },
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: "*3️⃣ Use the _Ask for help_ action.* If you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_)."
-            }
-        },
-        {
-            type: "image",
-            title: {
-                type: "plain_text",
-                text: "message_shortcut"
-            },
-            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif",
-            alt_text: "message_shortcut"
-        },
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: "*4️⃣ Use the _Ask for help_ shortcut.* If you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu."
-            }
-        },
-        {
-            type: "image",
-            title: {
-                type: "plain_text",
-                text: "global_shortcut"
-            },
-            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif",
-            alt_text: "global_shortcut"
-        },
-        {
-            type: "section",
-            text: {
-                type: "mrkdwn",
-                text: "*5️⃣ Use the _Create issue_ shortcut.* If you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_)."
-            }
-        },
-        {
-            type: "image",
-            title: {
-                type: "plain_text",
-                text: "github_issue"
-            },
-            image_url: "https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif",
-            alt_text: "github_issue"
-        },
-        {
-            type: "divider"
-        },
-        {
-            type: "context",
-            elements: [
-                {
+const introduction = (supportChannelId) => {
+    return {
+        text: "Hey there 👋 I'm your 1st Operator.",
+        blocks: [
+            {
+                type: "section",
+                text: {
                     type: "mrkdwn",
-                    text: "👀 View current person on call duty use `/oncall`\n❓Get help at any time type *help* in a DM with me"
+                    text: "Hey there 👋 I'm your 1st Operator.\n\nI'm here to help you operate and reach support for Operate First in Slack.\nThere multiple ways you can use my services:"
+                },
+            },
+            ...featureList(supportChannelId).map(f => ({
+                type: "section",
+                text: {
+                    type: "mrkdwn",
+                    text: f.text
                 }
-            ]
-        }
-    ]
-});
+            })),
+            {
+                type: "divider"
+            },
+            {
+                type: "context",
+                elements: [
+                    {
+                        type: "mrkdwn",
+                        text: [
+                            "👀 View current person on call duty use `/oncall`",
+                            "❓ Type *help* in a DM with me to get this message any time again",
+                            "🕵️ Take a look at my programming at <https://github.com/tumido/slack-first|tumido/slack-first>"
+                        ].join('\n')
+                    }
+                ]
+            }
+        ]
+    };
+};
 
 /**
  * React to `help` messages in direct messages only
@@ -149,6 +114,9 @@ const askIfShouldIntroduce: Middleware<SlackEventMiddlewareArgs> = async ({ even
                     type: "mrkdwn",
                     text: "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel. Would you like me to introduce myself to others?"
                 },
+            },
+            {
+                type: "divider"
             },
             {
                 type: 'actions',
@@ -190,6 +158,43 @@ const introduceBot: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ 
     await respond({ delete_original: true });
 };
 
+
+/**
+ * Home tab content
+ * @param param0 Slack payload for responding to events
+ */
+const homeTab: Middleware<SlackEventMiddlewareArgs> = async ({ event, client, context }) => {
+    await client.views.publish({
+        user_id: event.user,
+        view: {
+            type: "home",
+            blocks: [
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: "Hey there 👋 I'm 1st Operator.\nBelow you can find list of features."
+                    },
+                },
+                {
+                    type: "divider"
+                },
+                ...featureList(context.config.supportChannelId).map(f => ({
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: f.text,
+                    }
+                })),
+                {
+                    type: "divider"
+                },
+            ]
+        }
+    });
+};
+
+
 /**
  * Subscribe to events for misc
  * @param app Slack App
@@ -197,6 +202,7 @@ const introduceBot: Middleware<SlackActionMiddlewareArgs<"message">> = async ({ 
 const misc = (app: App): void => {
     app.action('dismiss_message', dismissMessage);
     app.action('introduce_bot', introduceBot);
+    app.event('app_home_opened', homeTab);
     app.event('member_joined_channel', askIfShouldIntroduce);
     app.message('help', helpMessage);
 };
