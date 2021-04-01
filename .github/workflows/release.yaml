@@ -15,7 +15,7 @@ jobs:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
           comment-id: ${{ github.event.client_payload.commentId }}
           body: |
-            🎁 Publishing to Quay.io...
+            🎁 Publishing to Quay.io. New job started [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -30,11 +30,14 @@ jobs:
           image_name: slack-first
           image_tag: ${{ github.event.client_payload.releaseVersion }}
 
+      - name: Tag as latest
+        run: docker tag slack-first:${{ github.event.client_payload.releaseVersion }} slack-first:latest
+
       - name: Push To Quay Action
-        uses: redhat-actions/push-to-registry@v1
+        uses: redhat-actions/push-to-registry@v2
         with:
           image: slack-first
-          tag: ${{ github.event.client_payload.releaseVersion }}
+          tags: latest ${{ github.event.client_payload.releaseVersion }}
           registry: quay.io/tcoufal
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}

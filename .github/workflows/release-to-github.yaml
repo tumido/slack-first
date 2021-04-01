@@ -47,7 +47,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            🚀 Release issue noticed. Build triggered from ${{ github.sha }}.
+            🚀 Release issue noticed. Build triggered from ${{ github.sha }}. Job started [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,6 +78,17 @@ jobs:
       - name: Run test
         run: npm test
 
+      - name: Create success comment
+        uses: peter-evans/create-or-update-comment@v1
+        if: ${{ success() }}
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment-id: ${{ needs.check-release.outputs.commentId }}
+          body: |
+            🔍 Tests passed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: Build
     needs: check-release
@@ -94,9 +105,21 @@ jobs:
           image_name: slack-first
           image_tag: test
 
+      - name: Create success comment
+        uses: peter-evans/create-or-update-comment@v1
+        if: ${{ success() }}
+        id: comment
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment-id: ${{ needs.check-release.outputs.commentId }}
+          body: |
+            🏗️ Container is buildable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     name: Release
-    needs: [test, build]
+    needs: [check-release, test, build]
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
@@ -105,7 +128,7 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           comment-id: ${{ needs.check-release.outputs.commentId }}
           body: |
-            📦 Releasing to Github...
+            📦 Releasing to Github
 
       - name: Checkout
         uses: actions/checkout@v2
