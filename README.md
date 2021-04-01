@@ -15,10 +15,6 @@ Local builds:
 - [NodeJS v14](https://nodejs.org/en/)
 - [s2i](https://github.com/openshift/source-to-image) and [Podman](https://podman.io/)
 
-Remote build:
-
-- [AiCoE-CI](https://github.com/AICoE/aicoe-ci) integration
-
 ## Configuration
 
 The bot can be configured via a local YAML config file. It watches for changes on this file and reflects the new config internally while running.
