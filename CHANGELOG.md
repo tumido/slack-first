@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/tumido/slack-first/compare/v1.1.0...v1.2.0) (2021-04-01)
+
+
+### Features
+
+* Base for the Home tab ([2a1d74f](https://github.com/tumido/slack-first/commit/2a1d74f08b339dd13b4dd0166fcefc0b3ec745a6))
+* Use node-watch instead of a custom watcher ([50acb01](https://github.com/tumido/slack-first/commit/50acb01cd70c311c5aee6a34979bba232cc102ea))
+
 # [1.1.0](https://github.com/tumido/slack-first/compare/v1.0.1...v1.1.0) (2021-03-24)
 
 
