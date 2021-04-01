@@ -23,23 +23,32 @@
     "start": "node dist/app.js",
     "lint": "eslint src --ext ts",
     "dev": "concurrently \"tsc -w\" \"nodemon -r dotenv/config dist/app.js\"",
-    "pretest": "npm run build && npm run lint",
-    "test": "echo \"No test specified\"",
+    "pretest": "npm run lint",
+    "test": "nyc mocha",
     "s2i:build": "rm -rf build && mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-14 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/github": "^7.2.1",
+    "@types/chai": "^4.2.15",
     "@types/js-yaml": "^4.0.0",
+    "@types/mocha": "^8.2.2",
+    "@types/rewire": "^2.5.28",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
+    "chai": "^4.3.4",
     "concurrently": "^6.0.1",
     "dotenv": "^8.2.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "mocha": "^8.3.2",
     "nodemon": "^2.0.7",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
+    "rewire": "^5.0.0",
+    "ts-node": "^9.1.1",
     "typescript": "^4.2.3"
   },
   "dependencies": {
@@ -121,5 +130,23 @@
       "@semantic-release/git",
       "@semantic-release/github"
     ]
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.spec.ts"
+    ],
+    "reporter": [
+      "text-summary",
+      "lcov"
+    ]
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "spec": "src/**/*.spec.ts"
   }
 }
