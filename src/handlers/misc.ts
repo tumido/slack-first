@@ -82,7 +82,8 @@ const introduction = (supportChannelId) => {
                     }
                 ]
             }
-        ]
+        ],
+        unfurl_links: false,
     };
 };
 
