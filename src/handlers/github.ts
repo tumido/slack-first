@@ -3,7 +3,7 @@ import { App, Middleware, SlackOptionsMiddlewareArgs, SlackShortcutMiddlewareArg
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
-import { GithubConfig } from '../middleware/config';
+import { Config, GithubConfig } from '../middleware/config';
 
 /**
  * Lookup user name from Slack user ID
@@ -22,7 +22,7 @@ const userNameLookup = async (client: WebClient, user_id: string) => {
  *
  * Content matching `src` regex is intended to be replaced by `dst`
  */
-type MentionReplace = {
+export type MentionReplace = {
     src: RegExp,
     dst: string
 };
@@ -165,7 +165,7 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
  * Create modal for GitHub issue creation
  * @param param0 Slack payload for shortcut action
  */
-const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
+const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
     await ack();
 
     const issueBody = await fetchThreadBody(body, client);
@@ -235,6 +235,68 @@ const createModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, clie
     });
 };
 
+
+/**
+ * Create modal for a new comment on existing GitHub issue
+ * @param param0 Slack payload for shortcut action
+ */
+const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
+    await ack();
+
+    const issueBody = await fetchThreadBody(body, client);
+
+    const ts = body.message.thread_ts || body.message_ts;
+    await client.views.open({
+        trigger_id: body.trigger_id,
+        view: {
+            type: 'modal',
+            callback_id: 'comment_on_issue',
+            private_metadata: `${ts}|${body.channel.id}`,
+            title: {
+                type: 'plain_text',
+                text: 'Comment on issue'
+            },
+            blocks: [
+                {
+                    type: "input",
+                    block_id: 'issue',
+                    label: {
+                        type: "plain_text",
+                        text: "Issue",
+                    },
+                    element: {
+                        type: "plain_text_input",
+                        placeholder: {
+                            type: "plain_text",
+                            text: "https://github.com/organization/repository/issues/123",
+                        },
+                        action_id: "issue",
+                    },
+                },
+                {
+                    type: 'input',
+                    block_id: 'body',
+                    label: {
+                        type: 'plain_text',
+                        text: 'Comment body'
+                    },
+                    element: {
+                        type: 'plain_text_input',
+                        action_id: 'body',
+                        initial_value: issueBody,
+                        multiline: true
+                    }
+                }
+            ],
+            submit: {
+                type: 'plain_text',
+                text: 'Submit',
+                emoji: true
+            }
+        }
+    });
+};
+
 /**
  * Open issue as a reaction to modal submit
  * @param param0 SSlack payload for view action
@@ -261,13 +323,93 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
     });
 };
 
+const issueRegex = /^.*\/(?<org>.+?)\/(?<repo>.+?)\/issues\/(?<number>\d+)$/;
+
+const parseIssueUrl = (url: string) => {
+    const parsed = url.match(issueRegex);
+    if (!parsed) { return null; }
+
+    return parsed.groups;
+};
+
+const isAllowed = (org: string, repo: string, config: Config): boolean => (
+    config?.github?.issues?.access.includes(`${org}/${repo}`)
+);
+
+const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, context, client, ack }) => {
+    const { github: gh }: { github: Octokit } = context;
+    const { org, repo, number } = parseIssueUrl(view.state.values.issue.issue.value);
+    const [thread_ts, channel] = body.view.private_metadata.split("|");
+
+    if (!org || !repo || !number) {
+        await ack({
+            response_action: 'errors',
+            errors: {
+                issue: "Value is not a valid Git Hub issue URL."
+            }
+        });
+        return;
+    }
+    if (!isAllowed(org, repo, context.config)) {
+        await ack({
+            response_action: 'errors',
+            errors: {
+                issue: "This repository is not whitelisted in the bot configuration."
+            }
+        });
+        return;
+    }
+
+    const issue = await gh.issues.get({
+        issue_number: number,
+        owner: org,
+        repo: repo
+    }).catch(error => ({ error }));
+
+    if (issue.error) {
+        await ack({
+            response_action: 'errors',
+            errors: {
+                issue: "Issue does not exist."
+            }
+        });
+        return;
+    }
+
+    const comment = await gh.issues.createComment({
+        issue_number: number,
+        owner: org,
+        repo: repo,
+        body: view.state.values.body.body.value,
+    }).catch(error => ({ error }));
+
+    if (comment.error) {
+        await ack({
+            response_action: 'errors',
+            errors: {
+                issue: "Bot is not allowed to comment on this issue."
+            }
+        });
+        return;
+    }
+
+    await ack();
+    await client.chat.postMessage({
+        channel,
+        thread_ts,
+        text: `This post/thread was captured as a comment in an issue: ${view.state.values.issue.issue.value}`
+    });
+};
+
 /**
  * Subscribe to events for GitHub
  * @param app Slack App
  */
 const github = (app: App): void => {
-    app.shortcut('open_issue_for_thread', githubMiddleware, createModal);
+    app.shortcut('open_issue_for_thread', githubMiddleware, createIssueModal);
+    app.shortcut('comment_issue_for_thread', githubMiddleware, commentIssueModal);
     app.options('repo_select', githubMiddleware, fetchRepos);
     app.view('open_issue', githubMiddleware, openIssue);
+    app.view('comment_on_issue', githubMiddleware, commentOnIssue);
 };
 export default github;
