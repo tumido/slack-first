@@ -4,6 +4,7 @@ import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
 import { Config, GithubConfig } from '../middleware/config';
+import { githubIssueTemplate } from '../templates/modal';
 
 /**
  * Lookup user name from Slack user ID
@@ -168,71 +169,47 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
 const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
     await ack();
 
-    const issueBody = await fetchThreadBody(body, client);
-
-    const ts = body.message.thread_ts || body.message_ts;
-    await client.views.open({
-        trigger_id: body.trigger_id,
-        view: {
-            type: 'modal',
-            callback_id: 'open_issue',
-            private_metadata: `${ts}|${body.channel.id}`,
-            title: {
-                type: 'plain_text',
-                text: 'Open issue'
+    const extraBlocks = [
+        {
+            type: "input",
+            block_id: 'repo',
+            label: {
+                type: "plain_text",
+                text: "Repository",
             },
-            blocks: [
-                {
-                    type: "input",
-                    block_id: 'repo',
-                    label: {
-                        type: "plain_text",
-                        text: "Repository",
-                    },
-                    element: {
-                        type: "external_select",
-                        placeholder: {
-                            type: "plain_text",
-                            text: "Select a repository",
-                        },
-                        action_id: "repo_select",
-                        min_query_length: 0
-                    },
+            element: {
+                type: "external_select",
+                placeholder: {
+                    type: "plain_text",
+                    text: "Select a repository",
                 },
-                {
-                    type: 'input',
-                    block_id: 'title',
-                    label: {
-                        type: 'plain_text',
-                        text: 'Title'
-                    },
-                    element: {
-                        type: 'plain_text_input',
-                        action_id: 'title',
-                    }
-                },
-                {
-                    type: 'input',
-                    block_id: 'body',
-                    label: {
-                        type: 'plain_text',
-                        text: 'Issue body'
-                    },
-                    element: {
-                        type: 'plain_text_input',
-                        action_id: 'body',
-                        initial_value: issueBody,
-                        multiline: true
-                    }
-                }
-            ],
-            submit: {
+                action_id: "repo_select",
+                min_query_length: 0
+            },
+        },
+        {
+            type: 'input',
+            block_id: 'title',
+            label: {
                 type: 'plain_text',
-                text: 'Submit',
-                emoji: true
+                text: 'Title'
+            },
+            element: {
+                type: 'plain_text_input',
+                action_id: 'title',
             }
         }
+    ];
+
+    const view = githubIssueTemplate({
+        title: 'Open issue',
+        body: await fetchThreadBody(body, client),
+        event: body,
+        callbackId: 'open_issue',
+        extraBlocks
     });
+
+    await client.views.open({ trigger_id: body.trigger_id, view });
 };
 
 
@@ -243,58 +220,33 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body,
 const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
     await ack();
 
-    const issueBody = await fetchThreadBody(body, client);
-
-    const ts = body.message.thread_ts || body.message_ts;
-    await client.views.open({
-        trigger_id: body.trigger_id,
-        view: {
-            type: 'modal',
-            callback_id: 'comment_on_issue',
-            private_metadata: `${ts}|${body.channel.id}`,
-            title: {
-                type: 'plain_text',
-                text: 'Comment on issue'
+    const extraBlocks = [
+        {
+            type: "input",
+            block_id: 'issue',
+            label: {
+                type: "plain_text",
+                text: "Issue",
             },
-            blocks: [
-                {
-                    type: "input",
-                    block_id: 'issue',
-                    label: {
-                        type: "plain_text",
-                        text: "Issue",
-                    },
-                    element: {
-                        type: "plain_text_input",
-                        placeholder: {
-                            type: "plain_text",
-                            text: "https://github.com/organization/repository/issues/123",
-                        },
-                        action_id: "issue",
-                    },
+            element: {
+                type: "plain_text_input",
+                placeholder: {
+                    type: "plain_text",
+                    text: "https://github.com/organization/repository/issues/123",
                 },
-                {
-                    type: 'input',
-                    block_id: 'body',
-                    label: {
-                        type: 'plain_text',
-                        text: 'Comment body'
-                    },
-                    element: {
-                        type: 'plain_text_input',
-                        action_id: 'body',
-                        initial_value: issueBody,
-                        multiline: true
-                    }
-                }
-            ],
-            submit: {
-                type: 'plain_text',
-                text: 'Submit',
-                emoji: true
-            }
-        }
+                action_id: "issue",
+            },
+        },
+    ];
+    const view = githubIssueTemplate({
+        title: 'Comment on issue',
+        body: await fetchThreadBody(body, client),
+        event: body,
+        callbackId: 'comment_on_issue',
+        extraBlocks
     });
+
+    await client.views.open({ trigger_id: body.trigger_id, view });
 };
 
 /**
