@@ -56,7 +56,7 @@
     "@octokit/rest": "^18.5.2",
     "@slack/bolt": "^3.3.0",
     "date-fns": "^2.20.0",
-    "eslint": "^7.23.0",
+    "eslint": "^7.24.0",
     "express": "^4.17.1",
     "js-yaml": "^4.0.0",
     "node-watch": "^0.7.1"
