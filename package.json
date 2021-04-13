@@ -55,7 +55,7 @@
     "@octokit/auth-app": "^3.3.0",
     "@octokit/rest": "^18.5.2",
     "@slack/bolt": "^3.3.0",
-    "date-fns": "^2.20.1",
+    "date-fns": "^2.20.2",
     "eslint": "^7.24.0",
     "express": "^4.17.1",
     "js-yaml": "^4.0.0",
