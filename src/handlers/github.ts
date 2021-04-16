@@ -271,7 +271,8 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
     await client.chat.postMessage({
         channel,
         thread_ts,
-        text: `This post/thread was captured in an issue: ${issue.data.html_url}`
+        text: `This post/thread was captured in an issue: ${formatIssueUrl(issue.data.html_url)}`,
+        unfurl_links: false,
     });
 };
 
@@ -282,6 +283,12 @@ const parseIssueUrl = (url: string) => {
     if (!parsed) { return null; }
 
     return parsed.groups;
+};
+
+const formatIssueUrl = (url: string) => {
+    const { org, repo, number } = parseIssueUrl(url);
+
+    return `<${url}|${org}/${repo}#${number}>`;
 };
 
 const isAllowed = (org: string, repo: string, config: Config): boolean => (
@@ -349,7 +356,8 @@ const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view,
     await client.chat.postMessage({
         channel,
         thread_ts,
-        text: `This post/thread was captured as a comment in an issue: ${view.state.values.issue.issue.value}`
+        text: `This post/thread was captured as a comment in an issue: ${formatIssueUrl(view.state.values.issue.issue.value)}`,
+        unfurl_links: false,
     });
 };
 
