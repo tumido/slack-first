@@ -122,3 +122,6 @@ dev.config.yaml
 # Local build
 build
 upload
+
+# Local scan
+.scannerwork
