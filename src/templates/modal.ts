@@ -1,7 +1,9 @@
-type githubIssueTemplateOptions = {
+import { MessageShortcut } from '@slack/bolt';
+
+export type githubIssueTemplateOptions = {
     title: string;
     body: string;
-    event: Record<string, Record<string, string>>; // Change once types are available
+    event: MessageShortcut; // Change once types are available
     callbackId: string;
     extraBlocks: Array<unknown>;
 };
