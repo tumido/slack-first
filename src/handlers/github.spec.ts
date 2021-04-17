@@ -47,4 +47,28 @@ describe('github', () => {
 
     //     it('should expand user mentions')
     // });
+
+    describe('isAllowed', () => {
+        let isAllowed: (org: string, repo: string, config: Config) => boolean;
+        let configStub: Config;
+
+        beforeEach(() => {
+            isAllowed = github.__get__('isAllowed');
+            configStub = { onCall: 'a', supportChannelId: 'b' };
+        });
+
+        it('should be truthy if no config', () => {
+            expect(isAllowed('org', 'repo', configStub)).to.be.true;
+        });
+
+        it('should be truthy for allowed repo', () => {
+            configStub.github = { issues: { access: ['org/repo'] } };
+            expect(isAllowed('org', 'repo', configStub)).to.be.true;
+        });
+
+        it('should be falsy for repo which is not explicitely allowed', () => {
+            configStub.github = { issues: { access: ['org/repo'] } };
+            expect(isAllowed('org', 'different-repo', configStub)).to.be.false;
+        });
+    });
 });

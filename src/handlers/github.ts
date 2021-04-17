@@ -373,6 +373,7 @@ const formatIssueUrl = (url: string) => {
  * @returns True if repo is enabled in the config
  */
 const isAllowed = (org: string, repo: string, config: Config): boolean =>
+    !config?.github?.issues?.access ||
     config?.github?.issues?.access.includes(`${org}/${repo}`);
 
 /**
