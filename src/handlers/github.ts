@@ -276,8 +276,14 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, cont
     });
 };
 
+// Generic regex for Git Hub issues URL
 const issueRegex = /^.*\/(?<org>.+?)\/(?<repo>.+?)\/issues\/(?<number>\d+)$/;
 
+/**
+ * Parse data from Git Hub issue url
+ * @param url Git Hub url for issue
+ * @returns RegExpMatchArray containing 'org', 'repo' and 'number' keys
+ */
 const parseIssueUrl = (url: string) => {
     const parsed = url.match(issueRegex);
     if (!parsed) { return null; }
@@ -285,16 +291,32 @@ const parseIssueUrl = (url: string) => {
     return parsed.groups;
 };
 
+/**
+ * Format Git Hub issue URL into short clickable string
+ * @param url Valid Git Hub url for issue
+ * @returns Slack text formatted clickable link string with display text: org/repo#123
+ */
 const formatIssueUrl = (url: string) => {
     const { org, repo, number } = parseIssueUrl(url);
 
     return `<${url}|${org}/${repo}#${number}>`;
 };
 
+/**
+ * Check if the config allows certain repo to be accessed via Slack
+ * @param org Git Hub organization
+ * @param repo Git Hub repository name
+ * @param config Context config file
+ * @returns True if repo is enabled in the config
+ */
 const isAllowed = (org: string, repo: string, config: Config): boolean => (
     config?.github?.issues?.access.includes(`${org}/${repo}`)
 );
 
+/**
+ * Comment on an existing issue
+ * @param param0 Slack payload for view action
+ */
 const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, context, client, ack }) => {
     const { github: gh }: { github: Octokit } = context;
     const { org, repo, number } = parseIssueUrl(view.state.values.issue.issue.value);
