@@ -194,53 +194,12 @@ const introduceBot: Middleware<SlackActionMiddlewareArgs<'message'>> = async ({
 };
 
 /**
- * Home tab content
- * @param param0 Slack payload for responding to events
- */
-const homeTab: Middleware<SlackEventMiddlewareArgs> = async ({
-    event,
-    client,
-    context,
-}) => {
-    await client.views.publish({
-        user_id: event.user,
-        view: {
-            type: 'home',
-            blocks: [
-                {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text:
-                            "Hey there 👋 I'm 1st Operator.\nBelow you can find list of features.",
-                    },
-                },
-                {
-                    type: 'divider',
-                },
-                ...featureList(context.config.supportChannelId).map((f) => ({
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: f.text,
-                    },
-                })),
-                {
-                    type: 'divider',
-                },
-            ],
-        },
-    });
-};
-
-/**
  * Subscribe to events for misc
  * @param app Slack App
  */
 const misc = (app: App): void => {
     app.action('dismiss_message', dismissMessage);
     app.action('introduce_bot', introduceBot);
-    app.event('app_home_opened', homeTab);
     app.event('member_joined_channel', askIfShouldIntroduce);
     app.message('help', helpMessage);
 };
