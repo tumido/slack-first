@@ -1,9 +1,9 @@
 type githubIssueTemplateOptions = {
-    title: string,
-    body: string,
-    event: Record<string, Record<string, string>>,  // Change once types are available
-    callbackId: string,
-    extraBlocks: Array<unknown>
+    title: string;
+    body: string;
+    event: Record<string, Record<string, string>>; // Change once types are available
+    callbackId: string;
+    extraBlocks: Array<unknown>;
 };
 
 /**
@@ -11,8 +11,16 @@ type githubIssueTemplateOptions = {
  * @param param0 Options for issue modal
  * @returns Block Kit object for Modal type surface view
  */
-export const githubIssueTemplate = ({ title, body, event, callbackId, extraBlocks }: githubIssueTemplateOptions): Record<string, unknown> => {
-    const privateMetadata = `${event.message.thread_ts || event.message_ts}|${event.channel.id}`;
+export const githubIssueTemplate = ({
+    title,
+    body,
+    event,
+    callbackId,
+    extraBlocks,
+}: githubIssueTemplateOptions): Record<string, unknown> => {
+    const privateMetadata = `${event.message.thread_ts || event.message_ts}|${
+        event.channel.id
+    }`;
 
     return {
         type: 'modal',
@@ -29,19 +37,19 @@ export const githubIssueTemplate = ({ title, body, event, callbackId, extraBlock
                 block_id: 'body',
                 label: {
                     type: 'plain_text',
-                    text: 'Issue body'
+                    text: 'Issue body',
                 },
                 element: {
                     type: 'plain_text_input',
                     action_id: 'body',
                     initial_value: body,
                     multiline: true,
-                }
-            }
+                },
+            },
         ],
         submit: {
             type: 'plain_text',
             text: 'Submit',
-        }
+        },
     };
 };

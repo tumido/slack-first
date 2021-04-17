@@ -2,13 +2,16 @@ import { expect } from 'chai';
 import rewire from 'rewire';
 
 import { MentionReplace } from './github';
+import { Config } from '../middleware/config';
 
 const github = rewire('./github');
 
-describe("github", () => {
+describe('github', () => {
     describe('expandMentions', () => {
-
-        let expandMentions: (text: string, mentions: Array<MentionReplace>) => string;
+        let expandMentions: (
+            text: string,
+            mentions: Array<MentionReplace>
+        ) => string;
 
         beforeEach(() => {
             expandMentions = github.__get__('expandMentions');

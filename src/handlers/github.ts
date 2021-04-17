@@ -1,5 +1,11 @@
 // @ts-nocheck
-import { App, Middleware, SlackOptionsMiddlewareArgs, SlackShortcutMiddlewareArgs, SlackViewMiddlewareArgs } from '@slack/bolt';
+import {
+    App,
+    Middleware,
+    SlackOptionsMiddlewareArgs,
+    SlackShortcutMiddlewareArgs,
+    SlackViewMiddlewareArgs,
+} from '@slack/bolt';
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
@@ -14,7 +20,9 @@ import { githubIssueTemplate } from '../templates/modal';
  */
 const userNameLookup = async (client: WebClient, user_id: string) => {
     const user = await client.users.info({ user: user_id });
-    if (!user.ok) { return user_id; }
+    if (!user.ok) {
+        return user_id;
+    }
     return user.user.profile.display_name || user.user.real_name;
 };
 
@@ -24,8 +32,8 @@ const userNameLookup = async (client: WebClient, user_id: string) => {
  * Content matching `src` regex is intended to be replaced by `dst`
  */
 export type MentionReplace = {
-    src: RegExp,
-    dst: string
+    src: RegExp;
+    dst: string;
 };
 
 /**
@@ -46,19 +54,29 @@ const expandMentions = (text: string, mentions: Array<MentionReplace>) => {
 
 /**
  * Find all users mentioned in the messages and allocate a MentionReplace for each.
- * 
+ *
  * Slack API returns user mentions as <@USER_ID> we need to translate this USER_ID number into a name
  * @param client Slack client
  * @param messages All messages in a thread
  * @returns Array of user mention replace guides
  */
-const resolveUserMentions = async (client: WebClient, messages: Array): Promise<Array<MentionReplace>> => {
-    const allUserMentionsSet = new Set(messages.flatMap(m => [m.user, ...(m.text.match(/(?<=<@).*?(?=>)/g) || [])]));
+const resolveUserMentions = async (
+    client: WebClient,
+    messages: Array
+): Promise<Array<MentionReplace>> => {
+    const allUserMentionsSet = new Set(
+        messages.flatMap((m) => [
+            m.user,
+            ...(m.text.match(/(?<=<@).*?(?=>)/g) || []),
+        ])
+    );
 
-    return Promise.all(Array.from(allUserMentionsSet).map(async m => ({
-        src: new RegExp(`<@${m}>`, 'g'),
-        dst: await userNameLookup(client, m)
-    })));
+    return Promise.all(
+        Array.from(allUserMentionsSet).map(async (m) => ({
+            src: new RegExp(`<@${m}>`, 'g'),
+            dst: await userNameLookup(client, m),
+        }))
+    );
 };
 
 /**
@@ -69,10 +87,12 @@ const resolveUserMentions = async (client: WebClient, messages: Array): Promise<
  * @returns Array of channel mention replace guides
  */
 const resolveChannelMentions = (messages: Array) => {
-    const allChannelMentionsSet = new Set(messages.flatMap(m => m.text.match(/(?<=<#.*?\|).*?(?=>)/g) || []));
-    return Array.from(allChannelMentionsSet).map(m => ({
+    const allChannelMentionsSet = new Set(
+        messages.flatMap((m) => m.text.match(/(?<=<#.*?\|).*?(?=>)/g) || [])
+    );
+    return Array.from(allChannelMentionsSet).map((m) => ({
         src: new RegExp(`<#.*?\\|${m}>`, 'g'),
-        dst: '#' + m
+        dst: '#' + m,
     }));
 };
 
@@ -83,11 +103,27 @@ const resolveChannelMentions = (messages: Array) => {
  * @param permalink Permalink to the thread on Slack
  * @returns Properly formatted GitHub issue body content
  */
-const issueBodyGenerator = async (client: WebClient, messages: Array, permalink: string) => {
-    const header = "Hey there 👋\n\nThis is a Slack discussion you wanted me to capture.\n\n";
+const issueBodyGenerator = async (
+    client: WebClient,
+    messages: Array,
+    permalink: string
+) => {
+    const header =
+        'Hey there 👋\n\nThis is a Slack discussion you wanted me to capture.\n\n';
 
-    const mentions = [...(await resolveUserMentions(client, messages)), ...resolveChannelMentions(messages)];
-    const body = "> " + messages.flatMap(m => [`**<@${m.user}> wrote:**`, ...m.text.split('\n'), '']).join('\n> ');
+    const mentions = [
+        ...(await resolveUserMentions(client, messages)),
+        ...resolveChannelMentions(messages),
+    ];
+    const body =
+        '> ' +
+        messages
+            .flatMap((m) => [
+                `**<@${m.user}> wrote:**`,
+                ...m.text.split('\n'),
+                '',
+            ])
+            .join('\n> ');
 
     const footer = `\n\n_Transcript of Slack thread: ${permalink}_`;
 
@@ -106,12 +142,12 @@ const fetchThreadBody = async (body, client: WebClient) => {
         const promises = [
             client.chat.getPermalink({
                 channel: body.channel.id,
-                message_ts: body.message.thread_ts
+                message_ts: body.message.thread_ts,
             }),
             client.conversations.replies({
                 channel: body.channel.id,
-                ts: body.message.thread_ts
-            })
+                ts: body.message.thread_ts,
+            }),
         ];
         const [permalink, thread] = await Promise.all(promises);
 
@@ -123,7 +159,7 @@ const fetchThreadBody = async (body, client: WebClient) => {
         // Triggered on a message without a thread - directly in a channel
         const permalink = await client.chat.getPermalink({
             channel: body.channel.id,
-            message_ts: body.message_ts
+            message_ts: body.message_ts,
         });
         return issueBodyGenerator(client, [body.message], permalink.permalink);
     }
@@ -134,8 +170,14 @@ const fetchThreadBody = async (body, client: WebClient) => {
  * @param param0 Slack payload for loading external options event
  * @returns List of repository names
  */
-const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context }) => {
-    const { github: gh, config: { github: ghConfig } }: { github: Octokit, ghCnfig: GithubConfig } = context;
+const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({
+    ack,
+    context,
+}) => {
+    const {
+        github: gh,
+        config: { github: ghConfig },
+    }: { github: Octokit; ghCnfig: GithubConfig } = context;
 
     let repos = [];
     if (ghConfig?.issues?.access && Array.isArray(ghConfig.issues.access)) {
@@ -145,20 +187,20 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
         try {
             // Lookup all repositories
             const ghRepos = await gh.apps.listReposAccessibleToInstallation();
-            repos = ghRepos.data.repositories.map(r => r.full_name);
+            repos = ghRepos.data.repositories.map((r) => r.full_name);
         } catch (e) {
             console.error(e);
         }
     }
 
     await ack({
-        options: repos.map(r => ({
+        options: repos.map((r) => ({
             text: {
-                type: "plain_text",
-                text: r
+                type: 'plain_text',
+                text: r,
             },
-            value: r
-        }))
+            value: r,
+        })),
     });
 };
 
@@ -166,25 +208,29 @@ const fetchRepos: Middleware<SlackOptionsMiddlewareArgs> = async ({ ack, context
  * Create modal for GitHub issue creation
  * @param param0 Slack payload for shortcut action
  */
-const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
+const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
+    body,
+    client,
+    ack,
+}) => {
     await ack();
 
     const extraBlocks = [
         {
-            type: "input",
+            type: 'input',
             block_id: 'repo',
             label: {
-                type: "plain_text",
-                text: "Repository",
+                type: 'plain_text',
+                text: 'Repository',
             },
             element: {
-                type: "external_select",
+                type: 'external_select',
                 placeholder: {
-                    type: "plain_text",
-                    text: "Select a repository",
+                    type: 'plain_text',
+                    text: 'Select a repository',
                 },
-                action_id: "repo_select",
-                min_query_length: 0
+                action_id: 'repo_select',
+                min_query_length: 0,
             },
         },
         {
@@ -192,13 +238,13 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body,
             block_id: 'title',
             label: {
                 type: 'plain_text',
-                text: 'Title'
+                text: 'Title',
             },
             element: {
                 type: 'plain_text_input',
                 action_id: 'title',
-            }
-        }
+            },
+        },
     ];
 
     const view = githubIssueTemplate({
@@ -206,35 +252,39 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body,
         body: await fetchThreadBody(body, client),
         event: body,
         callbackId: 'open_issue',
-        extraBlocks
+        extraBlocks,
     });
 
     await client.views.open({ trigger_id: body.trigger_id, view });
 };
 
-
 /**
  * Create modal for a new comment on existing GitHub issue
  * @param param0 Slack payload for shortcut action
  */
-const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body, client, ack }) => {
+const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
+    body,
+    client,
+    ack,
+}) => {
     await ack();
 
     const extraBlocks = [
         {
-            type: "input",
+            type: 'input',
             block_id: 'issue',
             label: {
-                type: "plain_text",
-                text: "Issue",
+                type: 'plain_text',
+                text: 'Issue',
             },
             element: {
-                type: "plain_text_input",
+                type: 'plain_text_input',
                 placeholder: {
-                    type: "plain_text",
-                    text: "https://github.com/organization/repository/issues/123",
+                    type: 'plain_text',
+                    text:
+                        'https://github.com/organization/repository/issues/123',
                 },
-                action_id: "issue",
+                action_id: 'issue',
             },
         },
     ];
@@ -243,7 +293,7 @@ const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body
         body: await fetchThreadBody(body, client),
         event: body,
         callbackId: 'comment_on_issue',
-        extraBlocks
+        extraBlocks,
     });
 
     await client.views.open({ trigger_id: body.trigger_id, view });
@@ -253,25 +303,36 @@ const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({ body
  * Open issue as a reaction to modal submit
  * @param param0 SSlack payload for view action
  */
-const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, context, client, ack }) => {
+const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({
+    body,
+    view,
+    context,
+    client,
+    ack,
+}) => {
     await ack();
     const { github: gh }: { github: Octokit } = context;
 
-    const [owner, repo] = view.state.values.repo.repo_select.selected_option.value.split('/');
-    const [thread_ts, channel] = body.view.private_metadata.split("|");
+    const [
+        owner,
+        repo,
+    ] = view.state.values.repo.repo_select.selected_option.value.split('/');
+    const [thread_ts, channel] = body.view.private_metadata.split('|');
 
     const issue = await gh.issues.create({
         owner,
         repo,
         title: view.state.values.title.title.value,
         body: view.state.values.body.body.value,
-        labels: context.config.issueLabels
+        labels: context.config.issueLabels,
     });
 
     await client.chat.postMessage({
         channel,
         thread_ts,
-        text: `This post/thread was captured in an issue: ${formatIssueUrl(issue.data.html_url)}`,
+        text: `This post/thread was captured in an issue: ${formatIssueUrl(
+            issue.data.html_url
+        )}`,
         unfurl_links: false,
     });
 };
@@ -286,7 +347,9 @@ const issueRegex = /^.*\/(?<org>.+?)\/(?<repo>.+?)\/issues\/(?<number>\d+)$/;
  */
 const parseIssueUrl = (url: string) => {
     const parsed = url.match(issueRegex);
-    if (!parsed) { return null; }
+    if (!parsed) {
+        return null;
+    }
 
     return parsed.groups;
 };
@@ -309,25 +372,32 @@ const formatIssueUrl = (url: string) => {
  * @param config Context config file
  * @returns True if repo is enabled in the config
  */
-const isAllowed = (org: string, repo: string, config: Config): boolean => (
-    config?.github?.issues?.access.includes(`${org}/${repo}`)
-);
+const isAllowed = (org: string, repo: string, config: Config): boolean =>
+    config?.github?.issues?.access.includes(`${org}/${repo}`);
 
 /**
  * Comment on an existing issue
  * @param param0 Slack payload for view action
  */
-const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view, context, client, ack }) => {
+const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({
+    body,
+    view,
+    context,
+    client,
+    ack,
+}) => {
     const { github: gh }: { github: Octokit } = context;
-    const { org, repo, number } = parseIssueUrl(view.state.values.issue.issue.value);
-    const [thread_ts, channel] = body.view.private_metadata.split("|");
+    const { org, repo, number } = parseIssueUrl(
+        view.state.values.issue.issue.value
+    );
+    const [thread_ts, channel] = body.view.private_metadata.split('|');
 
     if (!org || !repo || !number) {
         await ack({
             response_action: 'errors',
             errors: {
-                issue: "Value is not a valid Git Hub issue URL."
-            }
+                issue: 'Value is not a valid Git Hub issue URL.',
+            },
         });
         return;
     }
@@ -335,41 +405,46 @@ const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view,
         await ack({
             response_action: 'errors',
             errors: {
-                issue: "This repository is not whitelisted in the bot configuration."
-            }
+                issue:
+                    'This repository is not whitelisted in the bot configuration.',
+            },
         });
         return;
     }
 
-    const issue = await gh.issues.get({
-        issue_number: number,
-        owner: org,
-        repo: repo
-    }).catch(error => ({ error }));
+    const issue = await gh.issues
+        .get({
+            issue_number: number,
+            owner: org,
+            repo: repo,
+        })
+        .catch((error) => ({ error }));
 
     if (issue.error) {
         await ack({
             response_action: 'errors',
             errors: {
-                issue: "Issue does not exist."
-            }
+                issue: 'Issue does not exist.',
+            },
         });
         return;
     }
 
-    const comment = await gh.issues.createComment({
-        issue_number: number,
-        owner: org,
-        repo: repo,
-        body: view.state.values.body.body.value,
-    }).catch(error => ({ error }));
+    const comment = await gh.issues
+        .createComment({
+            issue_number: number,
+            owner: org,
+            repo: repo,
+            body: view.state.values.body.body.value,
+        })
+        .catch((error) => ({ error }));
 
     if (comment.error) {
         await ack({
             response_action: 'errors',
             errors: {
-                issue: "Bot is not allowed to comment on this issue."
-            }
+                issue: 'Bot is not allowed to comment on this issue.',
+            },
         });
         return;
     }
@@ -378,7 +453,9 @@ const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view,
     await client.chat.postMessage({
         channel,
         thread_ts,
-        text: `This post/thread was captured as a comment in an issue: ${formatIssueUrl(view.state.values.issue.issue.value)}`,
+        text: `This post/thread was captured as a comment in an issue: ${formatIssueUrl(
+            view.state.values.issue.issue.value
+        )}`,
         unfurl_links: false,
     });
 };
@@ -389,7 +466,11 @@ const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({ body, view,
  */
 const github = (app: App): void => {
     app.shortcut('open_issue_for_thread', githubMiddleware, createIssueModal);
-    app.shortcut('comment_issue_for_thread', githubMiddleware, commentIssueModal);
+    app.shortcut(
+        'comment_issue_for_thread',
+        githubMiddleware,
+        commentIssueModal
+    );
     app.options('repo_select', githubMiddleware, fetchRepos);
     app.view('open_issue', githubMiddleware, openIssue);
     app.view('comment_on_issue', githubMiddleware, commentOnIssue);

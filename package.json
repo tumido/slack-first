@@ -76,7 +76,7 @@
     "extends": [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
-      "prettier"
+      "plugin:prettier/recommended"
     ],
     "env": {
       "node": true
@@ -99,14 +99,14 @@
       "curly": "warn",
       "eqeqeq": "warn",
       "no-throw-literal": "warn",
-      "semi": "off",
+      "semi": "error",
       "@typescript-eslint/ban-ts-comment": "off"
     }
   },
   "prettier": {
     "trailingComma": "es5",
     "tabWidth": 4,
-    "semi": false,
+    "semi": true,
     "singleQuote": true
   },
   "release": {
