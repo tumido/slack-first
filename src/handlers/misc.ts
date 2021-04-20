@@ -32,7 +32,7 @@ const featureList = (supportChannelId: string) => [
         imageTitle: 'oncall_command',
     },
     {
-        text: `*2️⃣ Ask a question at <#${supportChannelId}>.*\nIf I can sense a question in this channel's main thread, it will offer you to tag the person on call duty for the day. I will open a new conversation in a thread to your original message.`,
+        text: `*2️⃣ Post to <#${supportChannelId}>.*\nIf you post a message to this channel's main thread, I will offer you to tag the person on call duty for the day. I will open a new conversation in a thread to your original message.`,
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png',
         imageTitle: 'support_channel_question',

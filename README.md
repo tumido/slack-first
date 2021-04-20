@@ -90,7 +90,7 @@ Type `/oncall` and the bot will tell you who is the dedicated support person on 
 
 ### Ask a question at #support
 
-If the bot notices a message with a question mark in the `#support` channel's main thread, it will offer the sender to tag the person on call duty for the day. The conversation with this person is opened as a thread to the original message.
+If the bot notices a message in the `#support` channel's main thread, it will offer the sender to tag the person on call duty for the day. The conversation with this person is opened as a thread to the original message.
 
 ![support_question](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png)
 

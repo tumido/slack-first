@@ -15,7 +15,11 @@ import {
 const onCallEphemeralMessage: Middleware<
     SlackEventMiddlewareArgs<'message'>
 > = async ({ message, client, context }) => {
-    if (message.channel !== context.config.supportChannelId) {
+    if (
+        message.channel !== context.config.supportChannelId ||
+        message.thread_ts ||
+        message.subtype
+    ) {
         return;
     }
 
@@ -27,7 +31,7 @@ const onCallEphemeralMessage: Middleware<
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text: `Hi <@${message.user}>!\n\nI see you've posted a question in this channel.\n\nDo you want me to tag <@${context.onCallUser}> who's on call duty for today?`,
+                    text: `Hi <@${message.user}>!\n\nI see you've posted a message in this channel.\n\nDo you want me to tag <@${context.onCallUser}> who's on call duty for today?`,
                 },
             },
             {
@@ -134,7 +138,7 @@ const tagOnCallCommand: Middleware<SlackCommandMiddlewareArgs> = async ({
  * @param app Slack App
  */
 export const onCall = (app: App): void => {
-    app.message('?', onCallEphemeralMessage);
+    app.message(onCallEphemeralMessage);
     app.action('tag_on_call_person', tagOnCallAction);
     app.shortcut('tag_on_call_person', tagOnCallAction);
     app.command('/oncall', tagOnCallCommand);
