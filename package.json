@@ -1,7 +1,7 @@
 {
   "name": "slack-first",
   "displayName": "Slack First",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Slack First is a chat-bot for Operate First",
   "homepage": "https://github.com/tumido/slack-first",
   "main": "dist/app.js",

@@ -1,3 +1,18 @@
+# [1.3.0](https://github.com/tumido/slack-first/compare/v1.2.0...v1.3.0) (2021-04-20)
+
+
+### Bug Fixes
+
+* Disable URL unfurl on help messages ([fca7baf](https://github.com/tumido/slack-first/commit/fca7baf93c02d508947e93370aa33a10522ae136))
+
+
+### Features
+
+* Modal for commenting a thread to an issue ([851d28e](https://github.com/tumido/slack-first/commit/851d28e5f5592ab5afa57505c575d2e9dc661252))
+* Remove Home tab base from dev preview ([a7d0476](https://github.com/tumido/slack-first/commit/a7d0476f793fb98ed4e4baed663b5de61e9d848a))
+* Respond to all support channel messages, skip replies ([37e6b18](https://github.com/tumido/slack-first/commit/37e6b18b92c67aeff3897669d797f7aef841a343))
+* **github:** Responses to opened issue display shortened links ([5efb739](https://github.com/tumido/slack-first/commit/5efb739fd6108e0574f37957e8b4aaad2c8d4a7e))
+
 # [1.2.0](https://github.com/tumido/slack-first/compare/v1.1.0...v1.2.0) (2021-04-01)
 
 
