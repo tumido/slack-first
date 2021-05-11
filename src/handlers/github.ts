@@ -281,8 +281,7 @@ const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
                 type: 'plain_text_input',
                 placeholder: {
                     type: 'plain_text',
-                    text:
-                        'https://github.com/organization/repository/issues/123',
+                    text: 'https://github.com/organization/repository/issues/123',
                 },
                 action_id: 'issue',
             },
@@ -313,10 +312,8 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({
     await ack();
     const { github: gh }: { github: Octokit } = context;
 
-    const [
-        owner,
-        repo,
-    ] = view.state.values.repo.repo_select.selected_option.value.split('/');
+    const [owner, repo] =
+        view.state.values.repo.repo_select.selected_option.value.split('/');
     const [thread_ts, channel] = body.view.private_metadata.split('|');
 
     const issue = await gh.issues.create({
@@ -406,8 +403,7 @@ const commentOnIssue: Middleware<SlackViewMiddlewareArgs> = async ({
         await ack({
             response_action: 'errors',
             errors: {
-                issue:
-                    'This repository is not whitelisted in the bot configuration.',
+                issue: 'This repository is not whitelisted in the bot configuration.',
             },
         });
         return;

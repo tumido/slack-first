@@ -12,55 +12,54 @@ import {
  * Respond to messages containing `?` in `supportChannelId` channel
  * @param param0 Slack payload for message responses
  */
-const onCallEphemeralMessage: Middleware<
-    SlackEventMiddlewareArgs<'message'>
-> = async ({ message, client, context }) => {
-    if (
-        message.channel !== context.config.supportChannelId ||
-        message.thread_ts ||
-        message.subtype
-    ) {
-        return;
-    }
+const onCallEphemeralMessage: Middleware<SlackEventMiddlewareArgs<'message'>> =
+    async ({ message, client, context }) => {
+        if (
+            message.channel !== context.config.supportChannelId ||
+            message.thread_ts ||
+            message.subtype
+        ) {
+            return;
+        }
 
-    await client.chat.postEphemeral({
-        channel: message.channel,
-        user: message.user,
-        blocks: [
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `Hi <@${message.user}>!\n\nI see you've posted a message in this channel.\n\nDo you want me to tag <@${context.onCallUser}> who's on call duty for today?`,
+        await client.chat.postEphemeral({
+            channel: message.channel,
+            user: message.user,
+            blocks: [
+                {
+                    type: 'section',
+                    text: {
+                        type: 'mrkdwn',
+                        text: `Hi <@${message.user}>!\n\nI see you've posted a message in this channel.\n\nDo you want me to tag <@${context.onCallUser}> who's on call duty for today?`,
+                    },
                 },
-            },
-            {
-                type: 'actions',
-                elements: [
-                    {
-                        type: 'button',
-                        text: {
-                            type: 'plain_text',
-                            text: `Yes, please`,
+                {
+                    type: 'actions',
+                    elements: [
+                        {
+                            type: 'button',
+                            text: {
+                                type: 'plain_text',
+                                text: `Yes, please`,
+                            },
+                            action_id: 'tag_on_call_person',
+                            style: 'primary',
+                            value: message.ts,
                         },
-                        action_id: 'tag_on_call_person',
-                        style: 'primary',
-                        value: message.ts,
-                    },
-                    {
-                        type: 'button',
-                        text: {
-                            type: 'plain_text',
-                            text: 'Dismiss',
+                        {
+                            type: 'button',
+                            text: {
+                                type: 'plain_text',
+                                text: 'Dismiss',
+                            },
+                            action_id: 'dismiss_message',
                         },
-                        action_id: 'dismiss_message',
-                    },
-                ],
-            },
-        ],
-        text: `Hi <@${message.user}>! Do you want me to tag the person on call duty for today?`,
-    });
-};
+                    ],
+                },
+            ],
+            text: `Hi <@${message.user}>! Do you want me to tag the person on call duty for today?`,
+        });
+    };
 
 const messageText = (support, user) =>
     `Hey <@${support}>, can you please help <@${user}>?`;
