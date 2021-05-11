@@ -11,12 +11,11 @@ import {
  * Simple delete of given message
  * @param param0 Slack payload for an action
  */
-const dismissMessage: Middleware<
-    SlackActionMiddlewareArgs<'message'>
-> = async ({ ack, respond }) => {
-    await ack();
-    await respond({ delete_original: true });
-};
+const dismissMessage: Middleware<SlackActionMiddlewareArgs<'message'>> =
+    async ({ ack, respond }) => {
+        await ack();
+        await respond({ delete_original: true });
+    };
 
 /**
  * Helper for outlining all supported features
@@ -25,8 +24,7 @@ const dismissMessage: Middleware<
  */
 const featureList = (supportChannelId: string) => [
     {
-        text:
-            "*1️⃣ Use the `/oncall` command*.\nType `/oncall` and I'll tell you who is the dedicated support person on call duty for today.",
+        text: "*1️⃣ Use the `/oncall` command*.\nType `/oncall` and I'll tell you who is the dedicated support person on call duty for today.",
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/oncall_command.png',
         imageTitle: 'oncall_command',
@@ -38,22 +36,19 @@ const featureList = (supportChannelId: string) => [
         imageTitle: 'support_channel_question',
     },
     {
-        text:
-            "*3️⃣ Use the _Ask for help_ action.*\nIf you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_).",
+        text: "*3️⃣ Use the _Ask for help_ action.*\nIf you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_).",
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif',
         imageTitle: 'message_shortcut',
     },
     {
-        text:
-            '*4️⃣ Use the _Ask for help_ shortcut.*\nIf you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu.',
+        text: '*4️⃣ Use the _Ask for help_ shortcut.*\nIf you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu.',
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif',
         imageTitle: 'global_shortcut',
     },
     {
-        text:
-            "*5️⃣ Use the _Create issue_ shortcut.*\nIf you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).",
+        text: "*5️⃣ Use the _Create issue_ shortcut.*\nIf you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).",
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif',
         imageTitle: 'github_issue',
@@ -73,8 +68,7 @@ const introduction = (supportChannelId) => {
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text:
-                        "Hey there 👋 I'm your 1st Operator.\n\nI'm here to help you operate and reach support for Operate First in Slack.\nThere multiple ways you can use my services:",
+                    text: "Hey there 👋 I'm your 1st Operator.\n\nI'm here to help you operate and reach support for Operate First in Slack.\nThere multiple ways you can use my services:",
                 },
             },
             ...featureList(supportChannelId).map((f) => ({
@@ -135,15 +129,13 @@ const askIfShouldIntroduce: Middleware<SlackEventMiddlewareArgs> = async ({
 
     await client.chat.postEphemeral({
         channel: event.channel,
-        text:
-            "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel.",
+        text: "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel.",
         blocks: [
             {
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text:
-                        "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel. Would you like me to introduce myself to others?",
+                    text: "Hey there 👋 I'm your 1st Operator. Thanks for adding me to this channel. Would you like me to introduce myself to others?",
                 },
             },
             {
