@@ -6,6 +6,7 @@ import watch from 'node-watch';
 import { loadYaml } from '../helpers/fs';
 
 const configFileName = process.env.SLACK_BOT_CONFIG as string;
+const onCallMembers = process.env.ON_CALL_MEMBERS as string;
 
 type OnCallConfig =
     | string
@@ -28,7 +29,19 @@ export type Config = {
     github?: GithubConfig;
 };
 
-let config = loadYaml(configFileName);
+let config: Config = null;
+
+const initConfig = (): void => {
+    config = loadYaml(configFileName);
+    if (onCallMembers) {
+        if (typeof config.onCall === 'string' || config.onCall.members) {
+            console.error('Illegal onCall config');
+            process.exit(1);
+        }
+        config.onCall.members = onCallMembers.split(',').map((m) => m.trim());
+    }
+    console.log(config);
+};
 
 /**
  * Config middleware initializer
@@ -36,10 +49,11 @@ let config = loadYaml(configFileName);
  * Starts the file watch for config changes or file changes using fs.watch. This uses Inotify, therefore it has to be requeued if the file is moved
  */
 export const initConfigMiddleware = (): void => {
+    initConfig();
     const watcher = watch(configFileName);
     watcher.on('change', () => {
         console.log(`${configFileName}: changed. Reloading`);
-        config = loadYaml(configFileName);
+        initConfig();
     });
 };
 

@@ -28,7 +28,7 @@ onCall: person-on-call-duty@example.com # Email address associated with a Slack 
 
 ### On-call configuration
 
-A person on call duty can be assingned either directly via:
+A person on call duty can be assigned either directly via:
 
 ```yaml
 onCall: person-on-call-duty@example.com # Email address associated with a Slack account
@@ -44,6 +44,8 @@ onCall:
     - person1-on-call-duty@example.com
     - person2-on-call-duty@example.com
 ```
+
+On call members can be specified via `ON_CALL_MEMBERS` environment variable.
 
 Schedule value has to be exactly:
 
