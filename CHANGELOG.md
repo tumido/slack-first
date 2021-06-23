@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/tumido/slack-first/compare/v1.4.0...v1.4.1) (2021-06-23)
+
+
+### Bug Fixes
+
+* Don't log config in prod ([54b84d8](https://github.com/tumido/slack-first/commit/54b84d8e23e65fe7adef9a7fd40856944828ee8d))
+
 # [1.4.0](https://github.com/tumido/slack-first/compare/v1.3.0...v1.4.0) (2021-06-23)
 
 
