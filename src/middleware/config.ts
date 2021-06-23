@@ -40,7 +40,6 @@ const initConfig = (): void => {
         }
         config.onCall.members = onCallMembers.split(',').map((m) => m.trim());
     }
-    console.log(config);
 };
 
 /**
