@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/tumido/slack-first/compare/v1.3.0...v1.4.0) (2021-06-23)
+
+
+### Features
+
+* Allow oncall members via environment variables ([cef4ed3](https://github.com/tumido/slack-first/commit/cef4ed3fa8b81f7b73dccad1c423501dec2d28ca))
+
 # [1.3.0](https://github.com/tumido/slack-first/compare/v1.2.0...v1.3.0) (2021-04-20)
 
 
