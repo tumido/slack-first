@@ -53,7 +53,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "@octokit/auth-app": "^3.5.0",
+    "@octokit/auth-app": "^3.5.2",
     "@octokit/rest": "^18.6.2",
     "@slack/bolt": "^3.4.0",
     "date-fns": "^2.22.1",
