@@ -6,7 +6,7 @@ import watch from 'node-watch';
 import { loadYaml } from '../helpers/fs';
 
 const configFileName = process.env.SLACK_BOT_CONFIG as string;
-const onCallMembers = process.env.ON_CALL_MEMBERS as string;
+const onCallMembersFileName = process.env.ON_CALL_MEMBERS_CONFIG as string;
 
 type OnCallConfig =
     | string
@@ -29,17 +29,19 @@ export type Config = {
     github?: GithubConfig;
 };
 
-let config: Config = null;
+export let config: Config = null;
 
 const initConfig = (): void => {
     config = loadYaml(configFileName);
-    if (onCallMembers) {
+    if (onCallMembersFileName) {
         if (typeof config.onCall === 'string' || config.onCall.members) {
             console.error('Illegal onCall config');
             process.exit(1);
         }
-        config.onCall.members = onCallMembers.split(',').map((m) => m.trim());
+        const onCallMembersConfig = loadYaml(onCallMembersFileName);
+        config.onCall.members = onCallMembersConfig;
     }
+    console.log(JSON.stringify(config, null, 4));
 };
 
 /**
@@ -111,7 +113,9 @@ export const configMiddleware: Middleware<AnyMiddlewareArgs> = async ({
     // Translate onCall email into a user ID
     const onCallUser = getOnCallUser(context.config.onCall);
     if (onCallUser) {
-        const user = await client.users.lookupByEmail({ email: onCallUser });
+        const user = await client.users.lookupByEmail({
+            email: onCallUser.slack,
+        });
         if (user.ok) {
             context.onCallUser = user.user.id;
         }
