@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { githubIssueTemplate, githubIssueTemplateOptions } from './modal';
 
 type RecursivePartial<T> = {

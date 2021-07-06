@@ -8,6 +8,7 @@ import {
 } from '@slack/bolt';
 import { Octokit } from '@octokit/rest';
 import { WebClient } from '@slack/web-api';
+
 import { githubMiddleware } from '../middleware/github';
 import { Config, GithubConfig } from '../middleware/config';
 import { githubIssueTemplate } from '../templates/modal';

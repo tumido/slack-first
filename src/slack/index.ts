@@ -1,0 +1,1 @@
+export { slackApp } from './app';
