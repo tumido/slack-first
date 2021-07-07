@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import rewire from 'rewire';
 
 import { MentionReplace } from './github';
-import { Config } from '../middleware/config';
+import { Config } from '../../helpers';
 
 const github = rewire('./github');
 
@@ -37,24 +37,19 @@ describe('github', () => {
         });
     });
 
-    // describe('resolveUserMentions', () => {
-
-    //     let resolveUserMentions: (client: WebClient, messages: Array<unknown>) => Promise<Array<MentionReplace>>;
-
-    //     beforeEach(() => {
-    //         resolveUserMentions = github.__get__('resolveUserMentions');
-    //     });
-
-    //     it('should expand user mentions')
-    // });
-
     describe('isAllowed', () => {
         let isAllowed: (org: string, repo: string, config: Config) => boolean;
         let configStub: Config;
 
         beforeEach(() => {
             isAllowed = github.__get__('isAllowed');
-            configStub = { onCall: 'a', supportChannelId: 'b' };
+            configStub = {
+                onCall: {
+                    members: [{ slack: 'a', github: 'a' }],
+                    schedule: 'daily',
+                },
+                supportChannelId: 'b',
+            };
         });
 
         it('should be truthy if no config', () => {

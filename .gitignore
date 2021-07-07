@@ -117,6 +117,7 @@ dist
 
 # Dev setup
 dev.config.yaml
+dev.members.yaml
 *.pem
 
 # Local build

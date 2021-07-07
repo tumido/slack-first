@@ -1,15 +1,6 @@
-import { Octokit } from '@octokit/rest';
 import { Middleware, AnyMiddlewareArgs } from '@slack/bolt';
 
-let githubClient: Octokit | undefined;
-
-/**
- * GitHub middleware initializer
- * @param client GitHub client
- */
-export const initGithubMiddleware = (client: Octokit): void => {
-    githubClient = client;
-};
+import { getGithubClient } from '../../helpers';
 
 /**
  * Middleware allowing the bot talk to GitHub
@@ -19,7 +10,7 @@ export const githubMiddleware: Middleware<AnyMiddlewareArgs> = async ({
     context,
     next,
 }) => {
-    context.github = githubClient;
+    context.github = getGithubClient();
     if (next) {
         await next();
     }

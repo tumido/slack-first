@@ -1,0 +1,1 @@
+export { githubApp } from './app';
