@@ -2,8 +2,10 @@ import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
 
 import { readFileToString, initGithubMiddleware } from '../helpers';
+import { createNodeMiddleware, Webhooks } from '@octokit/webhooks';
+import { ExpressReceiver } from '@slack/bolt';
 
-export const githubApp = (): Octokit => {
+export const githubApp = (receiver: ExpressReceiver): void => {
     // Initialize Github app connection
     const app = new Octokit({
         authStrategy: createAppAuth,
@@ -17,7 +19,15 @@ export const githubApp = (): Octokit => {
         },
     });
 
+    const webhooks = new Webhooks({ secret: 'first-operator' });
+    webhooks.onAny(({ id, name, payload }) => {
+        console.log(name, 'event received');
+    });
+
     initGithubMiddleware(app);
 
-    return app;
+    receiver.router.use(
+        '/github/events',
+        createNodeMiddleware(webhooks, { path: '/' })
+    );
 };
