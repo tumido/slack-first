@@ -5,7 +5,8 @@ export type githubIssueTemplateOptions = {
     body: string;
     event: MessageShortcut; // Change once types are available
     callbackId: string;
-    extraBlocks: Array<unknown>;
+    extraBlocksAbove?: Array<unknown>;
+    extraBlocksBelow?: Array<unknown>;
 };
 
 /**
@@ -18,7 +19,8 @@ export const githubIssueTemplate = ({
     body,
     event,
     callbackId,
-    extraBlocks,
+    extraBlocksAbove,
+    extraBlocksBelow,
 }: githubIssueTemplateOptions): Record<string, unknown> => {
     const privateMetadata = `${event.message.thread_ts || event.message_ts}|${
         event.channel.id
@@ -33,7 +35,7 @@ export const githubIssueTemplate = ({
             text: title,
         },
         blocks: [
-            ...extraBlocks,
+            ...(extraBlocksAbove || []),
             {
                 type: 'input',
                 block_id: 'body',
@@ -48,6 +50,7 @@ export const githubIssueTemplate = ({
                     multiline: true,
                 },
             },
+            ...(extraBlocksBelow || []),
         ],
         submit: {
             type: 'plain_text',

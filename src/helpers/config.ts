@@ -30,7 +30,7 @@ export type Config = {
     github?: GithubConfig;
 };
 
-export let config: Config;
+let config: Config;
 
 const initConfig = (): void => {
     config = loadYaml(configFileName) as Config;
@@ -45,6 +45,8 @@ const initConfig = (): void => {
         config.onCall.members = onCallMembersConfig;
     }
 };
+
+export const getConfig = (): Config => config;
 
 /**
  * Config middleware initializer
@@ -83,15 +85,13 @@ const onCallPivot = (schedule: string | undefined): number | void => {
  * @param onCallConfig On-call section of the configuration file
  * @returns Member from the config currently on duty
  */
-export const getOnCallUser = (
-    onCallConfig: OnCallConfig
-): OnCallMember | void => {
-    if (onCallConfig.override) {
-        return onCallConfig.override;
+export const getOnCallUser = (): OnCallMember | void => {
+    if (config.onCall.override) {
+        return config.onCall.override;
     }
-    const pivot = onCallPivot(onCallConfig.schedule);
+    const pivot = onCallPivot(config.onCall.schedule);
     if (pivot) {
-        return onCallConfig.members[pivot % onCallConfig.members.length];
+        return config.onCall.members[pivot % config.onCall.members.length];
     }
     console.error('Unable to fetch user on call duty. Check the config file.');
 };

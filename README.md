@@ -19,11 +19,15 @@ Local builds:
 
 The bot can be configured via a local YAML config file. It watches for changes on this file and reflects the new config internally while running.
 
+Configuration file is specified via `SLACK_BOT_CONFIG` environment variable. Additionally on call team members can be read from a separate config file specified by `ON_CALL_MEMBERS_CONFIG` environment variable.
+
 Basic settings:
 
 ```yaml
 supportChannelId: ID_OF_SUPPORT_CHANNEL # e.g. C01RY7X79R9
-onCall: person-on-call-duty@example.com # Email address associated with a Slack account
+onCall:
+   slack: person-on-call-duty@example.com # Email address associated with a Slack account
+   github: github_username
 ```
 
 ### On-call configuration
@@ -31,7 +35,9 @@ onCall: person-on-call-duty@example.com # Email address associated with a Slack 
 A person on call duty can be assigned either directly via:
 
 ```yaml
-onCall: person-on-call-duty@example.com # Email address associated with a Slack account
+onCall:
+   slack: person-on-call-duty@example.com # Email address associated with a Slack account
+   github: github_username
 ```
 
 Or a team can be scheduled using various rotation schemes:
@@ -39,13 +45,15 @@ Or a team can be scheduled using various rotation schemes:
 ```yaml
 onCall:
   schedule: daily|weekly
-  override: forced-person-on-call-duty@example.com
+  override:
+    slack: forced-person-on-call-duty@example.com
+    github: github_username0
   members:
-    - person1-on-call-duty@example.com
-    - person2-on-call-duty@example.com
+    - slack: person1-on-call-duty@example.com
+      github: github_username1
+    - slack: person2-on-call-duty@example.com
+      github: github_username2
 ```
-
-On call members can be specified via `ON_CALL_MEMBERS` environment variable.
 
 Schedule value has to be exactly:
 
@@ -117,6 +125,10 @@ If you want to capture a post or a thread into a GitHub issue, select `Create is
 
 Type `help` in a DM to the bot to receive a full feature list any time.
 
+### Github features
+
+Bot also supports ChatOps and label actions on GitHub. Add `bot/assign-to-oncall` label to an issue on watched repository or comment on said issue with `/assign-to-oncall` to assign person on call duty.
+
 ## Development setup
 
 ### Run bot locally
@@ -157,6 +169,7 @@ Locally in development mode runs the bot in a hot reloading mode - automatically
    SLACK_BOT_TOKEN=xoxb-****           # Obtained from Slack config, see Setup Slack application
    SLACK_SIGNING_SECRET=****           # ^
    SLACK_BOT_CONFIG=./dev.config.yaml
+   ON_CALL_MEMBERS_CONFIG=./dev.members.yaml
    GITHUB_APP_ID=number                # Obtained from Github App config, see Setup Github App
    GITHUB_INSTALLATION_ID=number       # ^
    GITHUB_PRIVATE_KEY=github.pem       # ^
@@ -209,7 +222,7 @@ This launch method uses `npm start` command which runs the production build of t
 3. Set subscriptions on _Event Subscriptions_ tab:
 
    1. Toggle _Enable Events_
-   2. Set _Request URL_ to the Bot URL obtained from Ngrok.
+   2. Set _Request URL_ to the Bot URL obtained from Ngrok with `/slack/events` path.
    3. Expand the _Subscribe bot to events_ and add following subscriptions:
       - `member_joined_channel`
       - `message.channels`
@@ -221,8 +234,8 @@ This launch method uses `npm start` command which runs the production build of t
 4. Enable interactivity at _Interactivity & Shortcuts_ tab:
 
    1. Toggle _Interactivity_
-   2. Set _Request URL_ to the Bot URL obtained from Ngrok.
-   3. Set _Options Load URL_ in the _Select Menus_ section to the Bot URL obtained from Ngrok.
+   2. Set _Request URL_ to the Bot URL obtained from Ngrok with `/slack/events` path.
+   3. Set _Options Load URL_ in the _Select Menus_ section to the Bot URL obtained from Ngrok with `/slack/events` path.
    4. Add following shortcuts via _Create New Shortcut_ button:
 
       | Name         | Scope   | Description                                 | Callback ID             |
@@ -269,14 +282,16 @@ This launch method uses `npm start` command which runs the production build of t
 
 1. [Create new GitHub App](https://github.com/settings/apps/new)
 2. Fill in a name, homepage URL (can be any valid URL starting with `http://` or `https://`)
-3. Deselect _Active_ checkbox in _Webhook_ section
-4. In _Repository permissions_ section enable _Read & Write_ for _Issues_ scope.
-5. Hit _Create GitHub App_
-6. Install your application:
+3. Set _Webhook URL_ to the Bot URL obtained from Ngrok with `/github/events` path.
+4. Set _Webhook secret_ to `first-operator`.
+5. In _Repository permissions_ section enable _Read & Write_ for _Issues_ scope.
+6. In _Subscribe to events_ section enable _Issues_ and _Issue comment_ scopes.
+7. Hit _Create GitHub App_
+8. Install your application:
    1. Go to _Install App_ tab
    2. Click _Install_ and confirm granted permissions
    3. In _Repository access_ select all repositories that you want this bot to have access to.
-7. Obtain credentials:
+9. Obtain credentials:
    1. Go to your [GitHub Apps](https://github.com/settings/apps) page and click _Edit_
    2. `GITHUB_APP_ID` is _App ID_ in the _About_ section on the _General_ tab
    3. `GITHUB_INSTALLATION_ID`: on _Install App_ tab click the gear button. Check the URL for your installation ID: `https://github.com/settings/installations/THIS_IS_THE_ID`
