@@ -6,7 +6,7 @@ healthCheck();
 
 const [app, receiver] = slackApp();
 
-githubApp();
+githubApp(receiver);
 
 // Mount additional endpoint for health check
 receiver.router.get('/healthz', (_req, res) => res.status(200).send('OK'));

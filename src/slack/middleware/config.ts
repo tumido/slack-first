@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { Middleware, AnyMiddlewareArgs } from '@slack/bolt';
+import { getOnCallUser, getConfig } from '../../helpers';
 
 /**
  * Middleware used to fetch the config file content and make it available to message handlers.
@@ -10,15 +10,15 @@ export const configMiddleware: Middleware<AnyMiddlewareArgs> = async ({
     next,
     client,
 }) => {
-    context.config = config;
+    context.config = getConfig();
 
     // Translate onCall email into a user ID
-    const onCallUser = getOnCallUser(context.config.onCall);
+    const onCallUser = getOnCallUser();
     if (onCallUser) {
         const user = await client.users.lookupByEmail({
             email: onCallUser.slack,
         });
-        if (user.ok) {
+        if (user.ok && user.user) {
             context.onCallUser = user.user.id;
         }
     }

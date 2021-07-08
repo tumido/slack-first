@@ -20,7 +20,7 @@ describe('modal', () => {
                     message: {},
                     message_ts: '456',
                 },
-                extraBlocks: [],
+                extraBlocksAbove: [],
             };
         });
 
@@ -54,8 +54,8 @@ describe('modal', () => {
             expect(modal).to.include({ private_metadata: '789|123' });
         });
 
-        it('should include extraBlocks before body', () => {
-            options.extraBlocks = [1, 2, 3];
+        it('should include extraBlocksAbove before body', () => {
+            options.extraBlocksAbove = [1, 2, 3];
 
             const modal = githubIssueTemplate(
                 options as githubIssueTemplateOptions

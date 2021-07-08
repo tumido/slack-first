@@ -12,6 +12,7 @@ import { WebClient } from '@slack/web-api';
 import { githubMiddleware } from '../middleware/github';
 import { Config, GithubConfig } from '../middleware/config';
 import { githubIssueTemplate } from '../templates/modal';
+import { getOnCallUser } from '../../helpers';
 
 /**
  * Lookup user name from Slack user ID
@@ -216,7 +217,7 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
 }) => {
     await ack();
 
-    const extraBlocks = [
+    const extraBlocksAbove = [
         {
             type: 'input',
             block_id: 'repo',
@@ -247,13 +248,37 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
             },
         },
     ];
+    const extraBlocksBelow = [
+        {
+            type: 'input',
+            block_id: 'extra',
+            label: {
+                type: 'plain_text',
+                text: 'Additional options',
+            },
+            element: {
+                type: 'checkboxes',
+                action_id: 'extra',
+                options: [
+                    {
+                        text: {
+                            type: 'plain_text',
+                            text: 'Assign to on-call',
+                        },
+                        value: 'assing_to_oncall',
+                    },
+                ],
+            },
+        },
+    ];
 
     const view = githubIssueTemplate({
         title: 'Open issue',
         body: await fetchThreadBody(body, client),
         event: body,
         callbackId: 'open_issue',
-        extraBlocks,
+        extraBlocksAbove,
+        extraBlocksBelow,
     });
 
     await client.views.open({ trigger_id: body.trigger_id, view });
@@ -270,7 +295,7 @@ const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
 }) => {
     await ack();
 
-    const extraBlocks = [
+    const extraBlocksAbove = [
         {
             type: 'input',
             block_id: 'issue',
@@ -293,7 +318,7 @@ const commentIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
         body: await fetchThreadBody(body, client),
         event: body,
         callbackId: 'comment_on_issue',
-        extraBlocks,
+        extraBlocksAbove,
     });
 
     await client.views.open({ trigger_id: body.trigger_id, view });
@@ -316,6 +341,12 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({
     const [owner, repo] =
         view.state.values.repo.repo_select.selected_option.value.split('/');
     const [thread_ts, channel] = body.view.private_metadata.split('|');
+    const extras = view.state.values.extra.extra.selected_options || [];
+
+    const shouldAssign = Boolean(
+        extras.filter((a) => a.value === 'assing_to_oncall').length
+    );
+    const onCall = getOnCallUser();
 
     const issue = await gh.issues.create({
         owner,
@@ -323,6 +354,7 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({
         title: view.state.values.title.title.value,
         body: view.state.values.body.body.value,
         labels: context.config.issueLabels,
+        assignee: shouldAssign && onCall?.github,
     });
 
     await client.chat.postMessage({
@@ -472,5 +504,6 @@ const github = (app: App): void => {
     app.options('repo_select', githubMiddleware, fetchRepos);
     app.view('open_issue', githubMiddleware, openIssue);
     app.view('comment_on_issue', githubMiddleware, commentOnIssue);
+    app.action('assign', async ({ ack }) => ack());
 };
 export default github;
