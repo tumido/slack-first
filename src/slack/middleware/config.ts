@@ -15,9 +15,7 @@ export const configMiddleware: Middleware<AnyMiddlewareArgs> = async ({
     // Translate onCall email into a user ID
     const onCallUser = getOnCallUser();
     if (onCallUser) {
-        const user = await client.users.lookupByEmail({
-            email: onCallUser.slack,
-        });
+        const user = await client.users.info({ user: onCallUser.slack });
         if (user.ok && user.user) {
             context.onCallUser = user.user.id;
         }

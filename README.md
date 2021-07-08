@@ -26,7 +26,7 @@ Basic settings:
 ```yaml
 supportChannelId: ID_OF_SUPPORT_CHANNEL # e.g. C01RY7X79R9
 onCall:
-   slack: person-on-call-duty@example.com # Email address associated with a Slack account
+   slack: U12345 # Slack user ID
    github: github_username
 ```
 
@@ -36,7 +36,7 @@ A person on call duty can be assigned either directly via:
 
 ```yaml
 onCall:
-   slack: person-on-call-duty@example.com # Email address associated with a Slack account
+   slack: U12345 # Slack user ID
    github: github_username
 ```
 
@@ -46,12 +46,12 @@ Or a team can be scheduled using various rotation schemes:
 onCall:
   schedule: daily|weekly
   override:
-    slack: forced-person-on-call-duty@example.com
+    slack: U123450
     github: github_username0
   members:
-    - slack: person1-on-call-duty@example.com
+    - slack: U123451
       github: github_username1
-    - slack: person2-on-call-duty@example.com
+    - slack: U123452
       github: github_username2
 ```
 
