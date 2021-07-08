@@ -1,3 +1,13 @@
+# [1.5.0](https://github.com/tumido/slack-first/compare/v1.4.1...v1.5.0) (2021-07-08)
+
+
+### Features
+
+* Assign on-call on github issue label/comment ([90fdc9d](https://github.com/tumido/slack-first/commit/90fdc9dd267997d776a9aca1d64fe121cf769346))
+* Consume webhooks ([405988d](https://github.com/tumido/slack-first/commit/405988df49821dc5db018d7ef9635cb8954c6899))
+* Load on call members from separate file ([b33fc93](https://github.com/tumido/slack-first/commit/b33fc934996f9b3606a85889fc6a0f5151e0a4be))
+* Use slack user ID instead of email ([7143496](https://github.com/tumido/slack-first/commit/714349627fca10baaa8134ba3a223a5936eba67f))
+
 ## [1.4.1](https://github.com/tumido/slack-first/compare/v1.4.0...v1.4.1) (2021-06-23)
 
 
