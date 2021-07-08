@@ -256,6 +256,7 @@ const createIssueModal: Middleware<SlackShortcutMiddlewareArgs> = async ({
                 type: 'plain_text',
                 text: 'Additional options',
             },
+            optional: true,
             element: {
                 type: 'checkboxes',
                 action_id: 'extra',
@@ -354,7 +355,7 @@ const openIssue: Middleware<SlackViewMiddlewareArgs> = async ({
         title: view.state.values.title.title.value,
         body: view.state.values.body.body.value,
         labels: context.config.issueLabels,
-        assignee: shouldAssign && onCall?.github,
+        assignee: (shouldAssign && onCall?.github) || null,
     });
 
     await client.chat.postMessage({
