@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/tumido/slack-first/compare/v1.5.0...v1.5.1) (2021-07-08)
+
+
+### Bug Fixes
+
+* On create issue form extras should be optional ([f192d69](https://github.com/tumido/slack-first/commit/f192d69a613c3e5b112c23b53bbb967a5718c115))
+
 # [1.5.0](https://github.com/tumido/slack-first/compare/v1.4.1...v1.5.0) (2021-07-08)
 
 
