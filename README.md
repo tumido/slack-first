@@ -67,6 +67,19 @@ Known limitations:
 - Exchanging duties/re-scheduling is possible only via reordering the `members` list or via `override`
 - `daily` rotation works with 7 days long weeks only. That means people will be scheduled/rotated for weekends as well.
 
+### FAQ configuration
+
+Bot tries to make it easier for any on-call person by pattern matching messages in `#support` channel and offering links to FAQ documents. This is configured via `faqs` section of the config:
+
+```yaml
+faqs:
+  - name: Description displayed on the message
+    regexp: /regexp/i # Can be either a string or a full JS regexp
+    url: https://example.com/some/link/to/docs.md
+```
+
+You can define as many FAQ matches as you need. If multiple FAQs are matched for a single message, all are offered to the user.
+
 ### Github configuration
 
 By default the bot can file issues to all repositories you grant it access to.
@@ -103,6 +116,12 @@ Type `/oncall` and the bot will tell you who is the dedicated support person on 
 If the bot notices a message in the `#support` channel's main thread, it will offer the sender to tag the person on call duty for the day. The conversation with this person is opened as a thread to the original message.
 
 ![support_question](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png)
+
+### Link FAQs at #support
+
+If the bot notices messages in the `#support` channel's main thread that contains a predefined regexp, it starts a new thread and links FAQ document for each matched regexp.
+
+![support_faq](https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_faq.png)
 
 ### Use the Ask for help action
 

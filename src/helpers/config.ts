@@ -24,10 +24,17 @@ type GithubConfig = {
     };
 };
 
+type FaqConfig = {
+    name: string;
+    regexp: string | RegExp;
+    url: string;
+};
+
 export type Config = {
     supportChannelId: string;
     onCall: OnCallConfig;
     github?: GithubConfig;
+    faqs?: Array<FaqConfig>;
 };
 
 let config: Config;
@@ -43,6 +50,26 @@ const initConfig = (): void => {
             onCallMembersFileName
         ) as Array<OnCallMember>;
         config.onCall.members = onCallMembersConfig;
+    }
+
+    if (config.faqs) {
+        config.faqs = config.faqs.map((m) => {
+            const parsed = (m.regexp as string).match(/(\/?)(.+)\1([a-z]*)/i);
+            if (!parsed) {
+                return m;
+            }
+            if (
+                parsed[3] &&
+                !/^(?!.*?(.).*?\1)[gmixXsuUAJ]+$/.test(parsed[3])
+            ) {
+                // Invalid flags
+                m.regexp = new RegExp(m.regexp);
+            } else {
+                // Create the regular expression
+                m.regexp = new RegExp(parsed[2], parsed[3]);
+            }
+            return m;
+        });
     }
 };
 

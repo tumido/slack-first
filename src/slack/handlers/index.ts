@@ -1,6 +1,7 @@
 import onCall from './on-call';
 import misc from './misc';
 import github from './github';
+import faq from './faq';
 import { App } from '@slack/bolt';
 
 /**
@@ -11,5 +12,6 @@ const init = (app: App): void => {
     github(app);
     misc(app);
     onCall(app);
+    faq(app);
 };
 export default init;
