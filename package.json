@@ -55,7 +55,7 @@
   "dependencies": {
     "@octokit/auth-app": "^3.6.0",
     "@octokit/rest": "^18.9.1",
-    "@octokit/webhooks": "^9.12.0",
+    "@octokit/webhooks": "^9.14.1",
     "@slack/bolt": "^3.6.0",
     "date-fns": "^2.23.0",
     "eslint": "^7.32.0",
