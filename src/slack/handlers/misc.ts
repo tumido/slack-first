@@ -36,19 +36,25 @@ const featureList = (supportChannelId: string) => [
         imageTitle: 'support_channel_question',
     },
     {
-        text: "*3️⃣ Use the _Ask for help_ action.*\nIf you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_).",
+        text: `*3️⃣ Post to <#${supportChannelId}>.*\nIf you post a message to this channel's main thread and your message contains a predefined regexp, I will start a new thread and link a FAQ document for each matched regexp.`,
+        imageUrl:
+            'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/support_question.png',
+        imageTitle: 'support_channel_question',
+    },
+    {
+        text: "*4️⃣ Use the _Ask for help_ action.*\nIf you want to raise a particular message to attention of our support team, select `Ask for help` in a message's context menu (click on _More actions_).",
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/message_shortcut.gif',
         imageTitle: 'message_shortcut',
     },
     {
-        text: '*4️⃣ Use the _Ask for help_ shortcut.*\nIf you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu.',
+        text: '*5️⃣ Use the _Ask for help_ shortcut.*\nIf you want to start a chat with our support team immediately, select `Ask for help` from the _Shortcuts_ menu.',
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/global_shortcut.gif',
         imageTitle: 'global_shortcut',
     },
     {
-        text: "*5️⃣ Use the _Create issue_ shortcut.*\nIf you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).",
+        text: "*6️⃣ Use the _Create issue_ shortcut.*\nIf you want to capture a post or a thread into a GitHub issue, select `Create issue` in a message's context menu (click on _More actions_).",
         imageUrl:
             'https://raw.githubusercontent.com/tumido/slack-first/main/assets/images/issue.gif',
         imageTitle: 'github_issue',
