@@ -57,7 +57,7 @@
     "@octokit/rest": "^18.11.2",
     "@octokit/webhooks": "^9.17.0",
     "@slack/bolt": "^3.7.0",
-    "date-fns": "^2.24.0",
+    "date-fns": "^2.25.0",
     "eslint": "^7.32.0",
     "express": "^4.17.1",
     "js-yaml": "^4.1.0",
