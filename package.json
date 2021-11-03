@@ -34,7 +34,7 @@
     "@semantic-release/git": "^10.0.0",
     "@semantic-release/github": "^8.0.1",
     "@types/chai": "^4.2.22",
-    "@types/js-yaml": "^4.0.3",
+    "@types/js-yaml": "^4.0.4",
     "@types/mocha": "^9.0.0",
     "@types/rewire": "^2.5.28",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
