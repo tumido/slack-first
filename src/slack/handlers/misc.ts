@@ -11,11 +11,12 @@ import {
  * Simple delete of given message
  * @param param0 Slack payload for an action
  */
-const dismissMessage: Middleware<SlackActionMiddlewareArgs<'message'>> =
-    async ({ ack, respond }) => {
-        await ack();
-        await respond({ delete_original: true });
-    };
+const dismissMessage: Middleware<
+    SlackActionMiddlewareArgs<'message'>
+> = async ({ ack, respond }) => {
+    await ack();
+    await respond({ delete_original: true });
+};
 
 /**
  * Helper for outlining all supported features
