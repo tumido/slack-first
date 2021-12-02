@@ -29,7 +29,7 @@
     "test:scan": "npm run test && sonar-scanner -Dsonar.projectKey=tumido:slack-first -Dsonar.sources=. -Dsonar.exclusions=**/*.spec.ts -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_LOGIN -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^8.0.2",
