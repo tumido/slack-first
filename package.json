@@ -61,7 +61,7 @@
     "eslint": "^8.6.0",
     "express": "^4.17.2",
     "js-yaml": "^4.1.0",
-    "node-watch": "^0.7.2"
+    "node-watch": "^0.7.3"
   },
   "eslintConfig": {
     "root": true,
