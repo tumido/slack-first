@@ -37,7 +37,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/mocha": "^9.1.0",
     "@types/rewire": "^2.5.28",
-    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.10.1",
     "chai": "^4.3.6",
     "concurrently": "^7.0.0",
