@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
           comment-id: ${{ github.event.client_payload.commentId }}
@@ -20,15 +20,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: S2I Build
-        uses: redhat-actions/s2i-build@v1
+        uses: redhat-actions/s2i-build@v2
         with:
           path_context: "."
           builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
-          image_name: slack-first
-          image_tag: ${{ github.event.client_payload.releaseVersion }}
+          image: slack-first
+          tags: ${{ github.event.client_payload.releaseVersion }} latest
 
       - name: Tag as latest
         run: docker tag slack-first:${{ github.event.client_payload.releaseVersion }} slack-first:latest
@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
           comment-id: ${{ github.event.client_payload.commentId }}
@@ -53,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Close Issue
-        uses: peter-evans/close-issue@v1
+        uses: peter-evans/close-issue@v2
         with:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
         env:
