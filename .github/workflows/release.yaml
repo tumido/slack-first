@@ -27,8 +27,8 @@ jobs:
         with:
           path_context: "."
           builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
-          image_name: slack-first
-          image_tag: ${{ github.event.client_payload.releaseVersion }}
+          image: slack-first
+          tags: ${{ github.event.client_payload.releaseVersion }} latest
 
       - name: Tag as latest
         run: docker tag slack-first:${{ github.event.client_payload.releaseVersion }} slack-first:latest

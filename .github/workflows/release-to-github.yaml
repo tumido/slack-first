@@ -102,8 +102,8 @@ jobs:
         with:
           path_context: "."
           builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
-          image_name: slack-first
-          image_tag: test
+          image: slack-first
+          tags: test
 
       - name: Create success comment
         uses: peter-evans/create-or-update-comment@v2
