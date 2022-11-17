@@ -27,7 +27,7 @@ jobs:
         run: exit 1
 
       - name: Close Issue
-        uses: peter-evans/close-issue@v1
+        uses: peter-evans/close-issue@v2
         if: ${{ !steps.access.outcome == 'failure' && steps.releaseLabel.outcome == 'success' }}
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -41,7 +41,7 @@ jobs:
         run: exit 1
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         if: ${{ success() }}
         id: comment
         with:
@@ -57,15 +57,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14
 
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -79,7 +79,7 @@ jobs:
         run: npm test
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         if: ${{ success() }}
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -95,10 +95,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup and Build
-        uses: redhat-actions/s2i-build@v1
+        uses: redhat-actions/s2i-build@v2
         with:
           path_context: "."
           builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
@@ -106,7 +106,7 @@ jobs:
           image_tag: test
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         if: ${{ success() }}
         id: comment
         with:
@@ -123,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.issue.number }}
           comment-id: ${{ needs.check-release.outputs.commentId }}
@@ -131,15 +131,15 @@ jobs:
             📦 Releasing to Github
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 14
 
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -156,7 +156,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger "Release" workflow if new release was created
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         if: steps.semantic.outputs.new_release_published == 'true'
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
@@ -164,7 +164,7 @@ jobs:
           client-payload: '{"github": ${{ toJson(github) }},"commentId": "${{ needs.check-release.outputs.commentId }}", "releaseVersion": "${{ steps.semantic.outputs.new_release_version }}" }'
 
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         if: steps.semantic.outputs.new_release_published != 'true'
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -175,7 +175,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Close Issue
-        uses: peter-evans/close-issue@v1
+        uses: peter-evans/close-issue@v2
         if: steps.semantic.outputs.new_release_published != 'true'
         with:
           issue-number: ${{ github.event.issue.number }}
