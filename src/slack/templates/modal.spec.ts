@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/naming-convention: ["error", { selector: "property", format: null }] */
+
 import { expect } from 'chai';
 
 import { githubIssueTemplate, githubIssueTemplateOptions } from './modal';
