@@ -25,7 +25,7 @@
     "dev": "concurrently \"tsc -w\" \"nodemon -r dotenv/config dist/app.js\"",
     "pretest": "npm run lint",
     "test": "nyc mocha",
-    "s2i:build": "rm -rf build && mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-14 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest",
+    "s2i:build": "rm -rf build && mkdir -p build && s2i build . registry.access.redhat.com/ubi8/nodejs-18 --as-dockerfile build/Dockerfile && podman build build -t slack-first:latest",
     "test:scan": "npm run test && sonar-scanner -Dsonar.projectKey=tumido:slack-first -Dsonar.sources=. -Dsonar.exclusions=**/*.spec.ts -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_LOGIN -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info"
   },
   "devDependencies": {

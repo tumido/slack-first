@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
 
       - name: Cache Node.js modules
         uses: actions/cache@v3
@@ -43,6 +43,6 @@ jobs:
         uses: redhat-actions/s2i-build@v2
         with:
           path_context: "."
-          builder_image: "registry.access.redhat.com/ubi8/nodejs-14"
+          builder_image: "registry.access.redhat.com/ubi8/nodejs-18"
           image: slack-first
           tags: test
