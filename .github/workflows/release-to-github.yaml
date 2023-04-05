@@ -41,7 +41,7 @@ jobs:
         run: exit 1
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: ${{ success() }}
         id: comment
         with:
@@ -79,7 +79,7 @@ jobs:
         run: npm test
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: ${{ success() }}
         with:
           issue-number: ${{ github.event.issue.number }}
@@ -106,7 +106,7 @@ jobs:
           tags: test
 
       - name: Create success comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: ${{ success() }}
         id: comment
         with:
@@ -123,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.issue.number }}
           comment-id: ${{ needs.check-release.outputs.commentId }}
@@ -164,7 +164,7 @@ jobs:
           client-payload: '{"github": ${{ toJson(github) }},"commentId": "${{ needs.check-release.outputs.commentId }}", "releaseVersion": "${{ steps.semantic.outputs.new_release_version }}" }'
 
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         if: steps.semantic.outputs.new_release_published != 'true'
         with:
           issue-number: ${{ github.event.issue.number }}

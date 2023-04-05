@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
           comment-id: ${{ github.event.client_payload.commentId }}
@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.client_payload.github.event.issue.number }}
           comment-id: ${{ github.event.client_payload.commentId }}
