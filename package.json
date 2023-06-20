@@ -41,7 +41,7 @@
     "@typescript-eslint/parser": "5.59.9",
     "chai": "4.3.7",
     "concurrently": "8.2.0",
-    "dotenv": "16.1.4",
+    "dotenv": "16.3.1",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
     "mocha": "10.2.0",
@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@octokit/auth-app": "4.0.13",
-    "@octokit/rest": "19.0.11",
+    "@octokit/rest": "19.0.13",
     "@octokit/webhooks": "11.1.1",
     "@slack/bolt": "3.13.1",
     "date-fns": "2.30.0",
